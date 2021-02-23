@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<toolset id="user_apps_toolset" template="false">
+   <tool app_file_path="./" handler_class="com.mathworks.appmanagement.desktop.ToolboxToolSetExtensionHandler" id="8a1121d6-3da2-4ae6-a669-0390faa0b6a4" label="BehaviorDEPOT_0.50" toolset_id="user_apps_toolset">
+      <callback>matlab.apputil.run('BehaviorDEPOT_050APP')</callback>
+      <parent_tool id="my_apps" toolset_id="apps_toolset"/>
+   </tool>
+</toolset>

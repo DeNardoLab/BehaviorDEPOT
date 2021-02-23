@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<compatibility>
+  <requiredProducts>
+    <requiredProduct name="MATLAB" version="9.8" identifier="1"/>
+  </requiredProducts>
+  <platformCompatibility windows="1" linux="1" macos="1" matlabonline="1"/>
+</compatibility>
