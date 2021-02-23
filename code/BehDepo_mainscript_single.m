@@ -8,7 +8,8 @@ P.cutoffThreshold = 0.1; % Minimum confidence value for retaining DLC-tracked po
 %Smoothing Parameters
 %% %%%%%%%%-UPDATE TO SET IN GUI-%%%%%%%%%%
 P.smoothMethod = 'lowess';
-P.smoothSpan = 5;
+P.smoothSpan = 14;
+
 %% %%%%%%%%----------------------%%%%%%%%%%
 
 % Behavior Classification Parameters
@@ -16,8 +17,8 @@ P.smoothSpan = 5;
 % P.freezing_minDuration = 0.90; % set in GUI
 % P.freezing_velocityThreshold = 0.38; % set in GUI
 % P.freezing_angleThreshold = 0.27; % set in GUI
-P.freezing_windowWidth = P.freezing_minDuration * 0.7; % empirically-determined
-P.freezing_countThreshold = 0.15; % empirically-determined
+P.freezing_windowWidth = P.freezing_minDuration * 0.7556; % empirically-determined
+P.freezing_countThreshold = 0.24; % empirically-determined
 P.part_save = "No";
 P.part_lookup = [];
 P.reuse_cue_name = 0;

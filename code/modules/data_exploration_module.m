@@ -64,7 +64,7 @@ end
 %     load(hB_search.name)
 % end
 
-load([hB_path, '\', hB_file])
+load([hB_path, hB_file])
 
 % Extract behaviors from hB struct
 hB_list = fieldnames(hBehavior);
@@ -144,13 +144,13 @@ if subset
     f1 = figure(1);
     subplot(2,1,1)
     histogram(m1_behav_Z_subset, 'EdgeColor', 'blue', 'FaceColor', 'blue', 'FaceAlpha', 0.5)
-    title([m1, ': Z Behavior v Non-Behavior Frames']);
+    title([m1, 'Z Behavior v Non-Behavior Frames']);
     hold on;
     histogram(m1_cmp_Z, 'EdgeColor', 'red', 'FaceColor', 'red', 'FaceAlpha', 0.2)
     legend('Behavior','Non-Behavior')
     subplot(2,1,2)
     histogram(m2_behav_Z_subset, 'EdgeColor', 'blue', 'FaceColor', 'blue', 'FaceAlpha', 0.5)
-    title([m2, ': Z Behavior v Non-Behavior Frames']);
+    title([m2, 'Z Behavior v Non-Behavior Frames']);
     hold on;
     histogram(m2_cmp_Z, 'EdgeColor', 'red', 'FaceColor', 'red', 'FaceAlpha', 0.2)
     legend('Behavior','Non-Behavior')
@@ -158,13 +158,13 @@ else
     f1 = figure(1);
     subplot(2,1,1)
     histogram(m1_behav_Z, 'EdgeColor', 'blue', 'FaceColor', 'blue', 'FaceAlpha', 0.5)
-    title([m1, ': Z Behavior v Non-Behavior Frames']);
+    title([m1, 'Z Behavior v Non-Behavior Frames']);
     hold on;
     histogram(m1_cmp_Z_subset, 'EdgeColor', 'red', 'FaceColor', 'red', 'FaceAlpha', 0.2)
     legend('Behavior','Non-Behavior')
     subplot(2,1,2)
     histogram(m2_behav_Z, 'EdgeColor', 'blue', 'FaceColor', 'blue', 'FaceAlpha', 0.5)
-    title([m2, ': Z Behavior v Non-Behavior Frames']);
+    title([m2, 'Z Behavior v Non-Behavior Frames']);
     hold on;
     histogram(m2_cmp_Z_subset, 'EdgeColor', 'red', 'FaceColor', 'red', 'FaceAlpha', 0.2)
     legend('Behavior','Non-Behavior')
@@ -256,10 +256,10 @@ xlabel(m2)
 
 %% TABLE 1: Calculated Results for chosen Metrics by Behavior/Non-Behavior Group 
 
-m1_b = [m1, ' (Behavior)'];
-m1_c = [m1, ' (Non-Behavior)'];
-m2_b = [m2, ' (Behavior)'];
-m2_c = [m2, ' (Non-Behavior)'];
+m1_b = join([m1, ' (Behavior)']);
+m1_c = join([m1, ' (Non-Behavior)']);
+m2_b = join([m2, ' (Behavior)']);
+m2_c = join([m2, ' (Non-Behavior)']);
 
 Name = {m1_b, m1_c, m2_b, m2_c}';
 Mean = [m1_behav_mean, m1_cmp_mean, m2_behav_mean, m2_cmp_mean]';

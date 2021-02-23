@@ -15,9 +15,12 @@ function video_folder_list = prepBatch(video_directory)
     for i = 1:size(directory_contents, 1)
         current_structure = directory_contents(i);
         if current_structure.isdir
-            ii = ii + 1;
-            video_folder_list(ii) = string(current_structure.name);
-            disp([num2str(i) ' directory loaded'])
+            if contains(current_structure.name, 'Results')
+            else
+                ii = ii + 1;
+                video_folder_list(ii) = string(current_structure.name);
+                disp([num2str(i) ' directory loaded'])
+            end
         end
     end
 end

@@ -9,23 +9,42 @@
 
 function interrater_module(P)
 
+analyzed_ID = '*_analyzed';
+hB_ID = 'hB_*';
+
 % get input directory, gather file names and get custom rater names
 msgbox('Select directory containing rater files')
 pause(2);
 working_directory = uigetdir('','Select directory containing rater files');
-files = dir2(working_directory);
-file_names = {}; 
+
+cd(working_directory)
+% all_files = dir2(working_directory);
+analyzed_search = dir(analyzed_ID);
+hB_search = dir(hB_ID);
+hB_names = {};
 names = {};
-for i = 1:size(files,1)
-    file_names{i} = [files(i).folder '\' files(i).name];
-    prompt = {['Assign name to rater file: ' files(i).name]};  
+for i = 1:size(hB_search,1)
+    hB_files{i} = [hB_search(i).folder '\' hB_search(i).name];
+    prompt = {['Assign name to rater file: ' hB_search(i).name]};  
     dlgtitle = 'Input';
     dims = [1 40];
     definput = {''};
     i_name = inputdlg(prompt,dlgtitle,dims,definput);
-    names{i} = string(i_name);
+    hB_names{i} = string(i_name);
 end
 
+for i = 1:size(analyzed_search, 1)
+    analyzed_files{i} = [analyzed_search(i).folder '\' analyzed_search(i).name '\Behavior.mat'];
+    prompt = {['Assign name to rater file: ' analyzed_search(i).name]};
+    dlgtitle = 'Input';
+    dims = [1 40];
+    definput = {''};
+    i_name = inputdlg(prompt,dlgtitle,dims,definput);
+    analyzed_names{i} = string(i_name);
+end
+
+files = [hB_files, analyzed_files];
+names = [hB_names, analyzed_names];
 names = cleanText(names);
 
 % optional:  filter out user specified rater from comparison
@@ -37,7 +56,7 @@ if P.do_subset
         if ~isempty(s)
             names(s) = '';
             %names(~cellfun('isempty',names));
-            file_names(s) = '';
+            hB_names(s) = '';
             %file_names = file_names(~cellfun('isempty',file_names));
         end
     end
@@ -58,7 +77,6 @@ results_filename = "IR_Results"; %Name of output file
 %% Load In Annotations Files From file_names
 
 IR_Results.working_directory = working_directory;
-IR_Results.file_names = file_names;
 IR_Results.names = names;
 IR_Results.reference_number = reference_number;
 
@@ -72,8 +90,8 @@ cd(working_directory)
 
 rater_data(1).Behavior = [];
 
-for i = 1:length(file_names)
-    structtmp = load(char(file_names(i)));
+for i = 1:length(files)
+    structtmp = load(char(files(i)));
     sn = string(fieldnames(structtmp));
     rater_data(i).Behavior = structtmp.(sn);
     clearvars struct sn
@@ -109,30 +127,30 @@ unique_behavs = unique(behavs_to_consider);
 X = repmat(behavs_to_consider', length(unique_behavs), 1);
 Y = repmat(unique_behavs, 1, size(behavs_to_consider, 1));
 behav_counts = sum(strcmpi(X, Y), 2);
-
-behavs_selected = unique_behavs(behav_counts > 1);
+behav_choices = unique_behavs(behav_counts > 1);
+behav_ind = listdlg('PromptString',{'Select behavior to compare raters across:'},'SelectionMode','single','ListString',behav_choices);
+behav_selected = behav_choices(behav_ind);
 
 clearvars behavs_to_consider behav_counts
 %% Loop through all behaviors to analyze
 
-for b = 1:length(behavs_selected)
-
-    %% Load relevant data
+for b = 1:length(behav_selected)
+    % Load relevant data
     
     data = struct('Bouts', [], 'Length', [], 'Count', [], 'Vector', [], 'Name', {});
     dataNames = {};
     
     c = 0;
     for ii = 1:length(rater_data)
-        if isfield(rater_data(ii).Behavior, behavs_selected{b})
-            rater_data(ii).Behavior.(behavs_selected{b}).Name = names{ii};
+        if isfield(rater_data(ii).Behavior, behav_selected{b})
+            rater_data(ii).Behavior.(behav_selected{b}).Name = names{ii};
             c = c + 1;
             dataNames(c) = names(ii);
-            data(c) = rater_data(ii).Behavior.(behavs_selected{b});
+            data(c) = rater_data(ii).Behavior.(behav_selected{b});
         end
     end
     
-    IR_Results.(behavs_selected{b}).names = dataNames;
+    IR_Results.(behav_selected{b}).names = dataNames;
     
     %% Generate multidimensional array with errors relative to all other raters
 
@@ -151,20 +169,20 @@ for b = 1:length(behavs_selected)
 
     total_frames = size(error_vector, 3);
     
-    IR_Results.(behavs_selected{b}).agreement = agreement_vector;
+    IR_Results.(behav_selected{b}).agreement = agreement_vector;
     
     %% Compare Percent Overlap between each set of Annotations
 
     percent_overlap = sum(~abs(error_vector), 3) / total_frames;
     percent_error = sum(abs(error_vector), 3) / total_frames;
 
-    IR_Results.(behavs_selected{b}).percent_overlap = sum(~abs(error_vector), 3) / total_frames;
-    IR_Results.(behavs_selected{b}).percent_error = sum(abs(error_vector), 3) / total_frames;
+    IR_Results.(behav_selected{b}).percent_overlap = sum(~abs(error_vector), 3) / total_frames;
+    IR_Results.(behav_selected{b}).percent_error = sum(abs(error_vector), 3) / total_frames;
 
     %% Calculate Disagreement Score
     
     disagreement_score = squeeze(sum(abs(error_vector), 1));
-    IR_Results.(behavs_selected{b}).disagreement = disagreement_score;
+    IR_Results.(behav_selected{b}).disagreement = disagreement_score;
 
     clearvars disagreement_score agreement_vector percent_overlap percent_error
     
@@ -195,8 +213,8 @@ for b = 1:length(behavs_selected)
     %% Calculate TP, TN, FP, FN for each comparison
     
     error_matrix = ref_data - comp_data;
-    TP = zeros(length(file_names), total_frames);
-    TN = zeros(length(file_names), total_frames);
+    TP = zeros(length(hB_names), total_frames);
+    TN = zeros(length(hB_names), total_frames);
     
     for i = 1:size(error_matrix, 1)
         for ii = 1:total_frames
@@ -227,10 +245,10 @@ for b = 1:length(behavs_selected)
     
     f1_score = 2 * ((precision .* recall) ./ (precision + recall));
 
-    IR_Results.(behavs_selected{b}).precision = precision;
-    IR_Results.(behavs_selected{b}).recall = recall;
-    IR_Results.(behavs_selected{b}).specificity = specificity;
-    IR_Results.(behavs_selected{b}).f1_score = f1_score;
+    IR_Results.(behav_selected{b}).precision = precision;
+    IR_Results.(behav_selected{b}).recall = recall;
+    IR_Results.(behav_selected{b}).specificity = specificity;
+    IR_Results.(behav_selected{b}).f1_score = f1_score;
     
     %% Calculate and Report Regions with Large Consecutive Errors (relative to reference)
 
@@ -253,35 +271,41 @@ for b = 1:length(behavs_selected)
 
         %% Construct a table with FP and FN inds (start:stop) and the span length
         errors = struct('start', [], 'stop', [], 'length', [], 'type', []);
-
+        p = fp.inds;
+        n = fn.inds;
+        
         for j = 1:length(data)
-            count = 0;
-            errors(1,j).type = 'FP';
-            for i = 1:length(fp(j).spans)
-                if fp(j).spans(i) > 1
-                    if count >= 1
-                        errors(1,j).stop(count) = fp(j).inds(i-1);
+            if ~isempty(p)
+                count = 0;
+                errors(1,j).type = 'FP';
+                for i = 1:length(fp(j).spans)
+                    if fp(j).spans(i) > 1
+                        if count >= 1
+                            errors(1,j).stop(count) = fp(j).inds(i-1);
+                        end
+                        count = count + 1;
+                        errors(1,j).start(count) = fp(j).inds(i);
                     end
-                    count = count + 1;
-                    errors(1,j).start(count) = fp(j).inds(i);
-                end
-                if length(errors(1,j).start) > length(errors(1,j).stop)
-                    errors(1,j).stop(count) = fp(j).inds(end);
+                    if length(errors(1,j).start) > length(errors(1,j).stop)
+                        errors(1,j).stop(count) = fp(j).inds(end);
+                    end
                 end
             end
-
-            count = 0;
-            errors(2,j).type = 'FN';
-            for i = 1:length(fn(j).spans)
-                if fn(j).spans(i) > 1
-                    if count >= 1
-                        errors(2,j).stop(count) = fn(j).inds(i-1);
+            
+            if ~isempty(n)
+                count = 0;
+                errors(2,j).type = 'FN';
+                for i = 1:length(fn(j).spans)
+                    if fn(j).spans(i) > 1
+                        if count >= 1
+                            errors(2,j).stop(count) = fn(j).inds(i-1);
+                        end
+                        count = count + 1;
+                        errors(2,j).start(count) = fn(j).inds(i);
                     end
-                    count = count + 1;
-                    errors(2,j).start(count) = fn(j).inds(i);
-                end
-                if length(errors(2,j).start) > length(errors(2,j).stop)
-                    errors(2,j).stop(count) = fn(j).inds(end);
+                    if length(errors(2,j).start) > length(errors(2,j).stop)
+                        errors(2,j).stop(count) = fn(j).inds(end);
+                    end
                 end
             end    
         end
@@ -289,23 +313,43 @@ for b = 1:length(behavs_selected)
         clearvars fn fp
         
         for i = 1:length(data)
-            errors(1,i).length = errors(1,i).stop - errors(1,i).start;
-            errors(2,i).length = errors(2,i).stop - errors(2,i).start;
+            if ~isempty(p)
+                errors(1,i).length = errors(1,i).stop - errors(1,i).start;
+            end
+            if ~isempty(n)
+                errors(2,i).length = errors(2,i).stop - errors(2,i).start;
+            end
         end
-
         %% Sort table by span length (largest to smallest)
 
         for j = 1:length(data)
 
             %Assemble table (per user)
-            Start = [errors(1,j).start, errors(2,j).start]';
-            Stop = [errors(1,j).stop, errors(2,j).stop]';
-            Length = [errors(1,j).length, errors(2,j).length]';
-            [type_fp{1:length(errors(1,j).start)}] = deal('FP');
-            [type_fn{1:length(errors(2,j).start)}] = deal('FN');
-            Type = [type_fp, type_fn]';
-            error_table = table(Start, Stop, Length, Type);
-
+            if isempty(p) & ~isempty(n)
+                Start = [errors(2,j).start]';
+                Stop = [errors(2,j).stop]';
+                Length = [errors(2,j).length]';
+                [type_fn{1:length(errors(2,j).start)}] = deal('FN');
+                Type = [type_fn]';
+                error_table = table(Start, Stop, Length, Type);
+            elseif ~isempty(p) & isempty(n)
+                Start = [errors(1,j).start]';
+                Stop = [errors(1,j).stop]';
+                Length = [errors(1,j).length]';
+                [type_fp{1:length(errors(1,j).start)}] = deal('FP');
+                Type = [type_fp]';
+                error_table = table(Start, Stop, Length, Type);
+            elseif isempty(p) & isempty(n)
+            else
+                Start = [errors(1,j).start, errors(2,j).start]';
+                Stop = [errors(1,j).stop, errors(2,j).stop]';
+                Length = [errors(1,j).length, errors(2,j).length]';
+                [type_fp{1:length(errors(1,j).start)}] = deal('FP');
+                [type_fn{1:length(errors(2,j).start)}] = deal('FN');
+                Type = [type_fp, type_fn]';
+                error_table = table(Start, Stop, Length, Type);
+            end
+            
             %Sort table
             [~, sort_order] = sortrows(error_table.Length, 'descend');
             error_table = error_table(sort_order,:);
@@ -314,9 +358,9 @@ for b = 1:length(behavs_selected)
             mkdir('Error tables')
             cd('Error tables')
             if ~isequal(reference_number, avg_key)
-                filename = behavs_selected{b} + "_Ref_" + names{reference_number} + "_Comp_" + names{j};
+                filename = behav_selected{b} + "_Ref_" + names{reference_number} + "_Comp_" + names{j};
             else
-                filename = behavs_selected{b} + "_Ref_Average" + "_Comp_" + names{j};
+                filename = behav_selected{b} + "_Ref_Average" + "_Comp_" + names{j};
             end
             writetable(error_table, filename)
             cd(working_directory)
@@ -334,8 +378,8 @@ msgbox('Interrater comparison complete; results saved in data directory')
 save_fig = 1;
 
 % iterate through behaviors
-for b = 1:length(behavs_selected)
-    behavior = behavs_selected{b};
+for b = 1:length(behav_selected)
+    behavior = behav_selected{b};
     
     if P.do_disagreement
         IR_disagreement(IR_Results, behavior, save_fig);

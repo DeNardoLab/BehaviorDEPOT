@@ -8,7 +8,8 @@ P.cutoffThreshold = 0.1; % Minimum confidence value for retaining DLC-tracked po
 %Smoothing Parameters
 %% %%%%%%%%-UPDATE TO SET IN GUI-%%%%%%%%%%
 P.smoothMethod = 'lowess';
-P.smoothSpan = 5;
+P.smoothSpan = 14;
+
 %% %%%%%%%%----------------------%%%%%%%%%%
 
 % Behavior Classification Parameters
@@ -16,9 +17,8 @@ P.smoothSpan = 5;
 % P.freezing_minDuration = 0.90; % (seconds) set minimum duration of freezing events to include
 % P.freezing_velocityThreshold = 0.38; % (pixels per frame) set velocity maximum for freezing
 % P.freezing_angleThreshold = 0.27; % (degrees) set angular movement max for freezing
-P.freezing_windowWidth = P.freezing_minDuration * 0.7; % empirically-determined
-P.freezing_countThreshold = 0.15; % empirically-determined
-    
+P.freezing_windowWidth = P.freezing_minDuration * 0.7111; % empirically-determined
+P.freezing_countThreshold = 0.2; % empirically-determined
 
 %% Batch Setup
 % Collect 'video_folder_list' from 'P.video_directory'
@@ -38,7 +38,7 @@ for j = 1:length(P.video_folder_list)
     basedir = pwd; %Assign current folder to basedir
     
 
-    if strcmpi(P.video_type, 'avi')
+    if size(dir('*.avi'), 1) == 1
         vid_extension = '*.avi';
     elseif strcmpi(P.video_type, 'mp4')
         vid_extension = '*.mp4';
@@ -59,9 +59,7 @@ for j = 1:length(P.video_folder_list)
     end
     
     clear V
-   
-    
-    
+
     % back to script dir
     cd(P.script_dir)
     

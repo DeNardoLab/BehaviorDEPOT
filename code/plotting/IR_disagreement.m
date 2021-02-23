@@ -7,7 +7,7 @@ function IR_disagreement(IR_Results, behavior, save_fig)
     data = IR_Results.(behavior).disagreement;
     imagesc(data)
     title('Rater Disagreement Score')
-    yticks([1:length(IR_Results.file_names)])
+    yticks([1:length(IR_Results.names)])
     yticklabels(IR_Results.names)
     xlabel('Frame')
     ylabel('Rater')

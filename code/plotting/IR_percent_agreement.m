@@ -5,7 +5,7 @@
 function IR_percent_agreement(IR_Results, behavior, save_fig)
 
     figure()
-    data = IR_Results.(behavior).agreement' / length(IR_Results.file_names);
+    data = IR_Results.(behavior).agreement' / length(IR_Results.names);
     imagesc(data)
     colorbar
     title('InterRater Percent Agreement')

@@ -2,7 +2,6 @@ function Params = makeParamsStruct(P)
     Params.Video = P.Video;
     Params.roi_name = P.roi_name;
     Params.tracking_fileType = P.tracking_fileType;
-    Params.video_type = P.video_type;
     Params.hampel = P.hmpl;
     Params.cutoffThreshold = P.cutoffThreshold;
     Params.Smoothing.method = P.smoothMethod;
