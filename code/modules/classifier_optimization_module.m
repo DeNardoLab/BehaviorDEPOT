@@ -197,9 +197,22 @@ savefig(f1, 'Precision_Recall')
 savefig(f2, 'F1_Scores')
 save(results_filename_ext, 'oResults')
 
+%% ROC curves
+[Xlog, Ylog, Tlog, AUClog] = perfcurve(cmp, ref, 1); % Tlog = threshold values; AUC = area under curve
+AUC = num2str(AUClog);
+
+% plot
+figure();
+plot(Xlog, Ylog, 'k', 'LineWidth', 1.5);
+xlabel('False positive rate');
+ylabel('True positive rate');
+title('ROC Curves for Classification by Logistic Regression');
+annotation('textbox', [0.6,0.55,0.3,0], 'string', 'AUC values','FontWeight','bold','LineStyle','none');
+annotation('textbox', [0.6,0.5,0,0], 'string', AUC,'Color','k');
+
 %% TO DO:
 % When using 1 parameter, fix resulting visualizations (p2 overrides)
 % p1--eliminate p1 axis values?
 % Load classifier from codebase
-% Integrate ROC curves
+
 end
