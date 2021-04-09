@@ -11,15 +11,14 @@
 
 function Freezing = calculateFreezing_custom(Metrics, Params)    
 
-numframes = length(Metrics.Location);
 % choose which freezing detector to use based on frame rate
 % under 40 fps uses jitter; above 40 uses velocity
 
 if Params.Video.frameRate < 40
     try
-        bp_list = [Metrics.Velocity.Head; Metrics.Velocity.Nose; Metrics.Velocity.Tailbase]';
+        parameters = [Metrics.Velocity.Left_Ear; Metrics.Velocity.Nose; Metrics.Velocity.Right_Ear]';
     catch
-        error('Cannot classify freezing. Standard FPS (< 40 FPS) freezing classifier requires Nose, Tailbase, and Head (or Ears) to be tracked');
+        error('Cannot classify freezing. Standard FPS (< 40 FPS) freezing classifier requires Nose, MidBack, and Head (or Ears) to be tracked');
     end
     
     
@@ -27,10 +26,12 @@ if Params.Video.frameRate < 40
      % find points at which the mean of the data changes most significantly
      % MinThreshold = minimum residual error improvement
     changethresh = 10*(1/Params.Freezing.sensitivityGain);
-    for bp = 1:3
-        test = bp_list(:,bp);        
+    [numframes, features] = size(parameters);
+    disp('new code is running');
+    for bp = 1:features
+        features_list = parameters(:,bp);        
         %ipt = findchangepts(test,'statistic','mean','MinThreshold',100000); 
-        ipt = findchangepts(test,'statistic','mean','MinThreshold',changethresh); 
+        ipt = findchangepts(features_list,'statistic','mean','MinThreshold',changethresh); 
         dipt = diff(ipt);
         consider = find(dipt > (Params.Freezing.minDuration * Params.Video.frameRate)); % identify frames where jitter is stable for more than 1sec 
         for cc = 1:length(consider)
@@ -39,18 +40,18 @@ if Params.Video.frameRate < 40
             long_end(cc) = ipt(considerpt+1);
         end
             for tt = 1:length(consider)
-                bites(tt) = mean(test(long_start(tt):long_end(tt)));
+                jittervar(tt) = mean(features_list(long_start(tt):long_end(tt)));
             end
-        if ~isempty(bites)
-            jitter(bp) = std(bites)*1 + mean(bites) * 0.75; % threshold per body point 
+        if ~isempty(jittervar)
+            jitter(bp) = std(jittervar)*1 + mean(jittervar) * 0.75; % threshold per body point 
         else
             jitter(bp) = 0;
         end
     end
     
-    freeze = bp_list(:,1) < jitter(1) & ...
-    bp_list(:,2) < jitter(2) & ...
-    bp_list(:,3) < jitter(3) & ...
+    freeze = parameters(:,1) < jitter(1) & ...
+    parameters(:,2) < jitter(2) & ...
+    parameters(:,3) < jitter(3) & ...
     abs(Metrics.Diff.HeadAngle)' < (Params.Freezing.angleThreshold); % freezing == 1, no freezing == 0
     
     % Mark freezing
@@ -59,7 +60,7 @@ if Params.Video.frameRate < 40
     
     % set minimum duration of freezing bout (1 second)
     for ff = 1:length(f_start)
-        if f_end(ff) - f_start(ff) < Params.Video.frameRate 
+        if f_end(ff) - f_start(ff) < round(Params.Video.frameRate .* Params.Freezing.minDuration)
             freeze(f_start(ff):f_end(ff)) = 0;
         end
     end
@@ -89,22 +90,21 @@ end
     freezingInds_end(1:round(numframes-1.8*Params.Freezing.windowWidth)) = 0;
     freezingInds = freezingInds | freezingInds_end;
 
-
-    
-
-    % find freeze start and end indices
-    freezingDiff = diff(freezingInds);
-    freezingDiffInds = find(freezingDiff);
-
-    % Remove events cut off by the start/end of the video
+    % Remove events cut off by the end of the video
     if freezingInds(length(freezingInds)) == 1
         %freezingIndices(freezingDiffIndices(end):length(freezingIndices)) = 0;
         freezingInds(length(freezingInds)) = 0;
-    elseif freezingInds(1) == 1
+    end
+    % Remove events cut off by the start of the video
+    if freezingInds(1) == 1
         %freezingIndices(1:freezingDiffIndices(1)) = 0;
         freezingInds(1) = 0; 
     end
-
+    
+    % find freeze start and end indices
+    freezingDiff = diff(freezingInds);
+    freezingDiffInds = find(freezingDiff);    
+    
     freezeStart = zeros(1, round(length(freezingDiffInds)/2));
     freezeEnd = zeros(1, round(length(freezingDiffInds)/2));
 
