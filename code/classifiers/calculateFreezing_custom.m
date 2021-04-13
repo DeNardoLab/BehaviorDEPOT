@@ -57,14 +57,7 @@ if Params.Video.frameRate < 40
     % Mark freezing
     f_start = strfind(freeze', [0 1]) + 1;
     f_end = strfind(freeze', [1 0]);
-    
-    % set minimum duration of freezing bout (1 second)
-    for ff = 1:length(f_start)
-        if f_end(ff) - f_start(ff) < round(Params.Video.frameRate .* Params.Freezing.minDuration)
-            freeze(f_start(ff):f_end(ff)) = 0;
-        end
-    end
-    
+        
     withinFreezingThreshold = freeze;
 
 
