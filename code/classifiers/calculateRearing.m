@@ -24,6 +24,11 @@ Rearing.Count = numel(find(state_chg==1)) - 1; % count number of changes (less o
 Rearing.Length = diff(find(state_chg)); % Number of repetitions
 
 t = Rearing.Vector';% look for bouts
-Rearing.Bouts(:,1) = findstr([0 t], [0 1])-1;  %gives indices of beginning of groups
-Rearing.Bouts(:,2) = findstr([t 0], [1 0]);    %gives indices of end of groups
+r = find(t ==1);
+if ~isempty(r)
+    Rearing.Bouts(:,1) = findstr([0 t], [0 1])-1;  %gives indices of beginning of groups
+    Rearing.Bouts(:,2) = findstr([t 0], [1 0]);    %gives indices of end of groups
+else
+    Rearing.Bouts = [];
+end
 end
