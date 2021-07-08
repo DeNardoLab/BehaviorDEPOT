@@ -1,4 +1,7 @@
 # BehaviorDEPOT
+
+07/08/21: BehaviorDEPOT is currently pre-release and is undergoing a substantial update that should be released late-July 2021.
+
 Repository for BehaviorDEPOT pipeline app files and source code
 
 **Patch Notes v0.51**
