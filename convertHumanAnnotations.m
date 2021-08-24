@@ -72,7 +72,7 @@ function convertHumanAnnotations(table_filename, total_frames, output_filename)
         hBehavior.(behav_list{i}).Bouts = [];
         hBehavior.(behav_list{i}).Length = [];
         hBehavior.(behav_list{i}).Count = 0;
-        hBehavior.(behav_list{i}).Vector = zeros(1, total_frames);
+        hBehavior.(behav_list{i}).Vector = zeros(total_frames, 1);
     end
 
     %% Use table inds to access human labels and transform data
