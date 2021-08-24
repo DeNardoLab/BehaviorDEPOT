@@ -1,8 +1,8 @@
 # BehaviorDEPOT
 
-BehaviorDEPOT is currently pre-release and is undergoing a substantial update that should be released late-Aug 2021.
+BehaviorDEPOT is currently pre-release and is undergoing a substantial update that should be released late-Aug 2021 (v1.0)
 
-Repository for BehaviorDEPOT pipeline app files and source code
+Demo data is now avaiable that can be used to test installation, classifiers, and modules. Due to limitations on file size, the original video file (necessary to run the analysis module from scratch) is not available on Github but can be downloaded from: https://drive.google.com/file/d/1SC1w37i0pgUdB_-ShLc-LCrIKkbUh9va/view?usp=sharing
 
 **Patch Notes v0.51**
 - Updated smoothing algorithm to better perform on behavior videos
