@@ -1,6 +1,6 @@
 % INPUTS:
-% 1) table_filename: str/char pointing to MATLAB table file -- 1st Column: StartFrame, 2nd
-% Column: StopFrame, 3rd Column (Title = Behavior): Behavior Label
+% 1) table_filename: str/char pointing to MATLAB table file -- 1st Column: Start Frame, 2nd
+% Column: Stop Frame, 3rd Column: Behavior Label
 
 % 2) total_frames: int, optional total number of frames in analyzed video
 % NOTE: if total_frames is empty, function will use the video file IF IN
@@ -16,8 +16,16 @@
 function convertHumanAnnotations(table_filename, total_frames, output_filename)
 
 % Load Params from MATLAB analysis script OR set total_frames to the total number of video frame
-    
-    human_labels = load(table_filename);
+    try
+        human_labels = load(table_filename);
+    catch
+        try
+            human_labels.table = readtable(table_filename);
+        catch
+            disp('Could not read table_filename')
+            return
+        end
+    end
     
     if ~exist('total_frames')
         % Grab information from video file
@@ -52,7 +60,7 @@ function convertHumanAnnotations(table_filename, total_frames, output_filename)
     
     %% Initialize Structures Using User Behavior Labels
 
-    behav_inds = cellstr(data_table.Behavior);
+    behav_inds = cellstr(table2array(data_table(:,3)));
     
     for i = 1:length(behav_inds)
         behav_inds{i} = strrep(behav_inds{i},' ','');
@@ -66,7 +74,7 @@ function convertHumanAnnotations(table_filename, total_frames, output_filename)
         behav_inds{i} = strrep(behav_inds{i},')','');
     end
     
-    behav_list = cellstr(unique(behav_inds));
+    behav_list = unique(behav_inds);
     
     for i = 1:length(behav_list)
         hBehavior.(behav_list{i}).Bouts = [];
