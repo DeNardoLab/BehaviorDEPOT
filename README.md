@@ -2,6 +2,8 @@
 
 - BehaviorDEPOT is currently pre-release and is undergoing a substantial update that should be released late-Aug 2021 (v1.0)
 
+- To find out more about BehaviorDEPOT or to cite the software in your own paper, see our pre-print on bioRxiv: https://www.biorxiv.org/content/10.1101/2021.06.20.449150v1
+
 - Demo data is now avaiable that can be used to test installation, classifiers, and modules. Due to limitations on file size, the original video file (necessary to run the analysis module from scratch) is not available on Github but can be downloaded from: https://drive.google.com/file/d/1SC1w37i0pgUdB_-ShLc-LCrIKkbUh9va/view?usp=sharing
 
 **Patch Notes v0.51**
@@ -41,7 +43,7 @@ BehaviorDEPOT was developed by Chris Gabirel, Benita Jin, Zachary Zeidler, and L
 ## License
 This work is licensed under the GNU General Public License 3.0.
 
-**-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+**----------------------------------------------------------------------------------------------------**
 
 # USAGE GUIDE
 
@@ -84,7 +86,23 @@ This work is licensed under the GNU General Public License 3.0.
     
 10) Results will be saved in a new folder in the same directory as the data.
 
-### Output: Classifier Module
+### Converting Manual Annotations to BehaviorDEPOT format (hB files)
+1) Save manual annotations as a 3 column table (1st: Start Frame, 2nd: Stop Frame, 3rd: Behavior Label)
+    - Function is compatible with data tables in .mat or .csv files
+    - To import data from larger excel/csv files, select "import data" in Matlab and create 3 column tables for each video analyzed
+    - After importing data as a table, save the table file as a .mat
+
+2) Run convertHumanAnnotations function in Matlab
+    - Inputs: 
+      - 1) table_filename: str/char pointing to MATLAB table file (requires path if not in current directory)
+      - 2) total_frames: int, optional total number of frames in analyzed video
+        - NOTE: if total_frames is empty, function will use the video file IF IN SAME FOLDER AS INPUT TABLE
+      - 3) output_filename: str/char, optional; (default behavior = hB_[original filename])
+  
+3) Results will be saved as an hBehavior structure (similar in format to Behavior structures from Analysis Module)
+    - File name will be 'hB_[original filename]' or named as [output_filename] if applicable
+
+### Output: Analysis Module
 1) Data is saved in separate analysis folder within the directory of the tracking spreadsheet.
 
 2) Depending on settings, output will include:
@@ -104,18 +122,18 @@ This work is licensed under the GNU General Public License 3.0.
       - DistanceTravelled_cm: total distance traveled in cm
     - Tracking.mat - a struct containing the location of each tracked part
       - The first layer of Tracking contains the original information from the tracking spreadsheet
-      - Smooth:  contains the location of each tracked part after smoothing
+      - Smooth: contains the location of each tracked part after smoothing
     - Behavior_Filter.mat - contains Behavior information filtered by space or time
-      - Temporal - contains Behavior information during cue frames
-        - EventVector - a vector indicating when the events occurred
-        - EventBouts - start and stop frames of each event
-        - [Behavior] -- eg Freezing
+      - Temporal: contains Behavior information during cue frames
+        - EventVector: a vector indicating when the events occurred
+        - EventBouts: start and stop frames of each event
+        - [Behavior]: e.g. Freezing
           - BehInEventVector:  vector when behavior occurred during an event (ie both EventVector and BehaviorVector are true)
           - Cue_BehInEventVector: events as rows, each containing a vector representing behavior
           - PerBehInEvent:  percent behavior in event. Proportion of behavior occurring during the event (vs outside of the event)
           - PerBehDuringCue:  percent of event duration that behavior occurs.
             \**Eg if Freezing occurred for 50% of first event, and 30% of second event, values would be {0.5, 0.3}*
-      - Spatial - contains Behavior information in ROIs
+      - Spatial: contains Behavior information in ROIs
         - PerTimeInROI:  percent total time spent in the ROI
         - inROIVector:  vector of whether animal was in ROI or not
         - [Behavior]
