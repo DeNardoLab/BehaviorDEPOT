@@ -27,6 +27,14 @@ function [frame, frame1, frame_idx, P] = videoInterface(video_name, P)
         for r = 1:P.number_ROIs
             disp(['Select ROI # ' num2str(r)]);
             imshow(frame)
+            
+            if r > 1
+               hold on;
+               for nroi = 1:(r-1)
+                   plot(polyshape(P.roi_limits{nroi}), 'FaceAlpha', 0.25)
+               end
+            end
+            
             title(['Select ROI # ' num2str(r)]);
             roi = drawpolygon;
             P.roi_limits{r} = roi.Position;
