@@ -31,7 +31,7 @@ function [frame, frame1, frame_idx, P] = videoInterface(video_name, P)
             if r > 1
                hold on;
                for nroi = 1:(r-1)
-                   plot(polyshape(P.roi_limits{nroi}), 'FaceAlpha', 0.25)
+                   plot(polyshape(P.roi_limits{nroi}), 'FaceAlpha', 0.18)
                end
             end
             
