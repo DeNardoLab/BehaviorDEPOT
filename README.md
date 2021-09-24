@@ -27,7 +27,7 @@ An open-sourced behavioral analysis toolbox designed to first compile and clean 
 We wanted a tool that seamlessly takes in output from DeepLabCut, smoothes out hiccups in tracking, and identifies bouts of specific behaviors, in particular freezing, as well as helpful metrics about animal movement. 
 
 ## Language, dependencies, and environments
-BehaviorDEPOT was written using MATLAB 2020b and requires the Signal Processing Toolbox, Image Processing Toolbox, and Statistics and Machine Learning Toolbox.
+BehaviorDEPOT was written using MATLAB 2020b and requires the Signal Processing Toolbox, Curve Fitting Toolbox, Image Processing Toolbox, and Statistics and Machine Learning Toolbox.
 Compatibility has been tested on Windows 10 and MacOS Catalina using Matlab 2018 - 2020b.
 Installation
 BehaviorDEPOT is written as a MATLAB app. Simply open the install file and allow MATLAB to install BehaviorDEPOT. It will appear under the ‘apps’ tab in Matlab. Click the app to launch.
