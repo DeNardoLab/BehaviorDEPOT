@@ -1,6 +1,6 @@
 # BehaviorDEPOT ReadME
 
-- BehaviorDEPOT is currently pre-release and is undergoing a substantial update that should be released late-Sept 2021 (v1.0)
+- BehaviorDEPOT is currently pre-release and is undergoing a substantial update that should be released early-October 2021 (v1.0)
 
 - To find out more about BehaviorDEPOT or to cite the software in your own paper, see our pre-print on bioRxiv: https://www.biorxiv.org/content/10.1101/2021.06.20.449150v2
 
