@@ -4,7 +4,7 @@
 
 - To find out more about BehaviorDEPOT or to cite the software in your own paper, see our pre-print on bioRxiv: https://www.biorxiv.org/content/10.1101/2021.06.20.449150v2
 
-- Demo data is now available that can be used to test installation, classifiers, and modules. Due to limitations on file size, the original video file (necessary to run the analysis module from scratch) is not available on Github but can be downloaded from: https://drive.google.com/file/d/1SC1w37i0pgUdB_-ShLc-LCrIKkbUh9va/view?usp=sharing
+- Demo data is now available that can be used to test installation, classifiers, spatial/temporal filtering, and modules. Due to limitations on file size, the original video file (necessary to run the analysis module from scratch) is not available on Github but can be downloaded from: https://drive.google.com/drive/folders/1VNv9FuXyiI4xgt-RokcVvWk-1dBovuqO?usp=sharing
 
 - Sample DeepLabCut networks that have been trained on our data are available for use. These may work on your own data, depending on the individual camera/chamber setup, but these models can serve as starting points for quickly training your own new networks! Find them here: https://drive.google.com/drive/folders/1Fl4PmLz6CWQcqOjfQ1q_60ZCZjI5949-?usp=sharing
 
