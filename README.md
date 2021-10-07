@@ -44,7 +44,7 @@ BehaviorDEPOT is written to be flexible to enable users to generate custom class
 If you’re curious about any of the code, want to tweak it, or create your own classifier, you can access the underlying scripts by simply right clicking on the app and navigating to where the app files are installed. To edit the GUI, you can open the BehaviorDEPOT.mlapp file in MATLAB’s ‘App Designer’.
 
 ## Credits
-BehaviorDEPOT was developed by Chris Gabirel, Benita Jin, Zachary Zeidler, and Laura DeNardo. If you find this tool useful, please cite the work:
+BehaviorDEPOT was developed by Chris Gabriel, Benita Jin, Zachary Zeidler, and Laura DeNardo. If you find this tool useful, please cite the work:
 {will be updated upon publication}
 
 ## License
