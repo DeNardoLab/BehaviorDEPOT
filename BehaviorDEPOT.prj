@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="2129725773" file="C:\BehaviorDEPOT\BehaviorDEPOT.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOT" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2629267909" file="C:\BehaviorDEPOT\BehaviorDEPOT.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOT" target="target.mlapps" target-name="Package App">
     <param.appname>BehaviorDEPOT</param.appname>
     <param.authnamewatermark>C. Gabriel, Z. Zeidler, B. Jin, L. DeNardo</param.authnamewatermark>
     <param.email>cjgabrie@g.ucla.edu</param.email>
@@ -8,7 +8,7 @@
     <param.icons />
     <param.summary>BehaviorDEPOT v1.0 application for analyzing top-down rodent DLC tracking and automatic behavior classification</param.summary>
     <param.description />
-    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tp8d54ce7f_d124_42d0_a1c2_71a2a62a6309.png</param.screenshot>
+    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tp97e14d9a_0b08_4e12_b072_1467be734d14.png</param.screenshot>
     <param.version>1.0</param.version>
     <param.products.name>
       <item>MATLAB</item>
@@ -48,35 +48,13 @@
     <fileset.depfun>
       <file>${PROJECT_ROOT}\code\BehDEPOT_mainscript.m</file>
       <file>${PROJECT_ROOT}\code\convertHumanAnnotations_BD.m</file>
-      <file>${PROJECT_ROOT}\code\functions\calculateEvents.m</file>
-      <file>${PROJECT_ROOT}\code\functions\calculateMetrics.m</file>
-      <file>${PROJECT_ROOT}\code\functions\calculateROI.m</file>
-      <file>${PROJECT_ROOT}\code\functions\cleanText.m</file>
-      <file>${PROJECT_ROOT}\code\functions\filterIntersect.m</file>
-      <file>${PROJECT_ROOT}\code\functions\genTracking_custom.m</file>
-      <file>${PROJECT_ROOT}\code\functions\importDLCTracking.m</file>
-      <file>${PROJECT_ROOT}\code\functions\launch_IR_module.m</file>
-      <file>${PROJECT_ROOT}\code\functions\makeParamsStruct.m</file>
-      <file>${PROJECT_ROOT}\code\functions\prepBatch.m</file>
-      <file>${PROJECT_ROOT}\code\functions\saveAnalysis.m</file>
-      <file>${PROJECT_ROOT}\code\functions\smoothTracking_custom.m</file>
-      <file>${PROJECT_ROOT}\code\functions\videoInterface.m</file>
-      <file>${PROJECT_ROOT}\code\modules\classifier_optimization_module.m</file>
-      <file>${PROJECT_ROOT}\code\modules\data_exploration_module.m</file>
-      <file>${PROJECT_ROOT}\code\modules\interrater_module.m</file>
-      <file>${PROJECT_ROOT}\code\modules\validation_module.m</file>
-      <file>${PROJECT_ROOT}\code\plotting\IR_disagreement.m</file>
-      <file>${PROJECT_ROOT}\code\plotting\IR_percent_agreement.m</file>
-      <file>${PROJECT_ROOT}\code\plotting\IR_percent_overlap.m</file>
-      <file>${PROJECT_ROOT}\code\plotting\IR_performance.m</file>
-      <file>${PROJECT_ROOT}\code\plotting\plotBouts.m</file>
-      <file>${PROJECT_ROOT}\code\plotting\plotPointTracking.m</file>
-      <file>${PROJECT_ROOT}\code\plotting\plotPrefs_launchIR.m</file>
-      <file>${PROJECT_ROOT}\code\plotting\plotTrajectoryMap.m</file>
-      <file>C:\Users\chris\Desktop\Matlab Scripts &amp; Functions\Testing\Validation Module\plotValidationAvg.m</file>
-      <file>C:\Users\chris\Desktop\Matlab Scripts &amp; Functions\Testing\Validation Module\plotValidationPerformance.m</file>
     </fileset.depfun>
-    <fileset.resources />
+    <fileset.resources>
+      <file>${PROJECT_ROOT}\code\classifiers</file>
+      <file>${PROJECT_ROOT}\code\functions</file>
+      <file>${PROJECT_ROOT}\code\modules</file>
+      <file>${PROJECT_ROOT}\code\plotting</file>
+    </fileset.resources>
     <fileset.package />
     <build-deliverables>
       <file location="${PROJECT_ROOT}" name="installation" optional="false">C:\BehaviorDEPOT\installation</file>
