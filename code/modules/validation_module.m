@@ -25,19 +25,49 @@ for file_num = 1:length(to_validate)
     
     if size(ref_search, 1) == 1
         ref_file = ref_search.name;
-        load(ref_file);
-    else
-        disp('Error: Reference data not found')
+    elseif size(ref_search, 1) == 0
+        disp(['Error: Reference data not found in ' d_folder])
+        return
+    elseif size(ref_search, 1) > 1
+        choose_ref = cell(size(ref_search, 1), 1);
+        for i = 1:size(ref_search, 1)
+            choose_ref{i} = ref_search(i).name;
+        end
+        [select, tf] = listdlg('PromptString','Select reference file to use:',...
+        'SelectionMode','single','ListString',choose_ref);
+        if ~tf
+            disp('Analysis stopped')
+            return
+        end
+        ref_file = choose_ref{select}; 
+        clearvars select tf
     end
+    
+    load(ref_file);
     
     if size(comp_search, 1) == 1
         comp_dir = comp_search.name;
-        cd(comp_dir)
-        load('Behavior.mat')
-        cd('../')
-    else
-        disp('Error: analyzed folder not found (or multiple found)')
+    elseif size(comp_search, 1) == 0
+        disp(['Error: BehaviorDEPOT output data not found in ' d_folder])
+        return
+    elseif size(comp_search, 1) > 1
+        choose_comp = cell(size(comp_search, 1), 1);
+        for i = 1:size(comp_search, 1)
+            choose_comp{i} = comp_search(i).name;
+        end
+        [select, tf] = listdlg('PromptString','Select comparison file to use:',...
+        'SelectionMode','single','ListString',choose_comp);
+        if ~tf
+            disp('Analysis stopped')
+            return
+        end
+        comp_dir = choose_comp{select}; 
+        clearvars select tf
     end
+    
+    cd(comp_dir)
+    load('Behavior.mat')
+    cd('../')
     
     VResults.ReferenceFiles(file_num, :) = string(ref_file);
     VResults.ComparisonFiles(file_num, :) = string(comp_dir);

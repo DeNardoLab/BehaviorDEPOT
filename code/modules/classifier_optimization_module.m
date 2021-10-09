@@ -58,12 +58,19 @@ ref = hBehavior.(behavior_to_test).Vector;
 cd(class_path)
 class_search = dir;
 class_search(1:2) = [];
+classifier_names = {};
+c = 1;
 
 for i = 1:size(class_search, 1)
-    classifier_names{i} = class_search(i).name;
+    % Remove param files
+    if ~startsWith(class_search(i).name, 'P_')
+        classifier_names{c} = class_search(i).name;
+        c = c + 1;
+    end
 end
 
 % Prompt User to choose classifier
+disp('Select classifier file to test.')
 class_ind = listdlg('PromptString', {'Select classifier file to test.'}, 'ListString', classifier_names, 'SelectionMode', 'single');
 classifier = classifier_names{class_ind};
 classifier_noext = extractBefore(classifier, ".");
@@ -122,7 +129,7 @@ for p1 = 1:length(thresh1_values)
     testParams.(behavior_to_test).(thresh1{1}) = thresh1_values(p1);
     for p2 = 1:length(thresh2_values)
         testParams.(behavior_to_test).(thresh2{1}) = thresh2_values(p2); 
-        testBehavior = class_fn(Metrics, testParams);
+        testBehavior = class_fn(testParams, Tracking, Metrics);
         cmp = testBehavior.Vector;
         error = ref - cmp;
         tp = zeros(length(error),1);
@@ -200,6 +207,5 @@ save(results_filename_ext, 'oResults')
 %% TO DO:
 % When using 1 parameter, fix resulting visualizations (p2 overrides)
 % p1--eliminate p1 axis values?
-% Load classifier from codebase
 % Integrate ROC curves
 end

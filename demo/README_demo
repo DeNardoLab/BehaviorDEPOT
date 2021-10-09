@@ -1,0 +1,80 @@
+Instructions for Using BehaviorDEPOT Demo Data to Classify Freezing
+
+
+Running Analysis Module
+
+1) Download files onto your computer
+  - To test analysis module: place tracking CSV and video files into a directory
+  - To test other modules: run demo data or download '_analyzed' folders and place in folder along with associated hB file
+
+2) Open BehaviorDEPOT app
+  - Choose the classifier(s) you want use
+  - Use default parameter values for freezing (min duration: 0.9, velocity threshold: 0.59, angle threshold: 15, jitter: 1)
+  - Select plots to generate
+  
+** For demo 2:
+  - Select 1 ROI (platform)
+  - Check box for 'apply frame-locked event filter' (tones)
+  
+3) Set pixel-to-cm calibration
+  - For demo 1: 32 px/cm
+  - For demo 2: 23 px/cm
+
+4) Run analysis module (smoothing may take some time depending on the computer specs)
+  - If running spatial ROI, you will be prompted to draw and name the ROI
+
+5) Register tracked parts
+  - Use the labeled image to register body parts tracked with DLC to those known by BehaviorDEPOT
+
+** For demo 2:
+  - Select 1 event (tone)
+  - Select included csv containing tone timestamps
+
+6) View output
+  - Output files will be generated in same folder as video and tracking files
+  - Selected plots will be saved in results folder
+
+Generating hBehavior Files
+  - BehaviorDEPOT converts human annotation data into hBehavior files; these files feed into the remaining modules along with BehaviorDEPOT output folders
+  - Currently, the function that accomplishes this, 'convertHumanAnnotations.m', is not accessible through the GUI (will be resolved in upcoming update)
+  
+1) Download convertHumanAnnotations.m from BehaviorDEPOT Github
+
+2) Add function into a folder on the PATH or place in folder along with annotation tables to convert
+
+3) Run function
+  - The first input should be the filename for the table to convert
+  - The second input should the total number of frames in the dataset 
+    (if left empty, the function will attempt to detect the video and read the total frames, if in the same folder)
+   
+   
+Testing Other Modules
+
+1) Data Exploration Module
+  - Click on the module button in GUI
+  - Select BehaviorDEPOT output folder ('_analyzed') and hBehavior file
+  - Choose metrics and behavior to examine
+
+2) Classifier Optimization Module
+  - Click on the module button in GUI
+  - Select BehaviorDEPOT output folder ('_analyzed') and hBehavior file
+  - Select classifier and parameters to test
+  - Input list (any of any length) of values to test
+  
+3) Validation Module
+  - This module is designed to evaluate the performance of classifiers across multiple videos
+  - Place folders containing BehaviorDEPOT output and hB files in a directory (a folder of folders, one for each video to evaluate)
+  - Click on the module button in GUI
+  - Select folder with datasets to validate
+  
+4) Inter-Rater Module
+  - This module is designed to evaluate multiple sets of annotations on the same video
+  - Place hB files from all raters in a folder (can include a '_analyzed' folder if you want to compare BehaviorDEPOT annoations)
+  - Click on the module button in GUI
+  - Select folder with hB files to compare
+  - Input name for each rater
+  - Select reference (choosing 'average' selects the average projection of all raters as a reference)
+
+Notes
+  - On Macs, you can only see the prompt in the Matlab command window (not within pop-up windows)
+  - Lowess smoothing can be slow. This results in a long pause after ‘Tracked 8 points’. Our next version will have options to select a faster smoothing operation, if desired 

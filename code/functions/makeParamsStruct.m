@@ -1,31 +1,38 @@
 function Params = makeParamsStruct(P)
+
+    %% Copy Classifier Parameters from P.Params struct
+    Params = P.Params;
+    
+    %% Basic Information
     Params.Video = P.Video;
     Params.roi_name = P.roi_name;
     Params.tracking_fileType = P.tracking_fileType;
-    Params.hampel = P.hmpl;
+    Params.hampel = P.hampel;
     Params.cutoffThreshold = P.cutoffThreshold;
+    
+    %% Smoothing Params
     Params.Smoothing.method = P.smoothMethod;
     Params.Smoothing.span = P.smoothSpan;
-    Params.Freezing.velocityThreshold = P.freezing_velocityThreshold;
-    Params.Freezing.angleThreshold = P.freezing_angleThreshold;
-    Params.Freezing.minDuration = P.freezing_minDuration;
-    Params.Freezing.windowWidth = round(Params.Video.frameRate * P.freezing_windowWidth);
-    Params.Freezing.countThreshold = Params.Video.frameRate * P.freezing_countThreshold;
+    
+    %% Spatial ROI Params
     Params.do_roi = P.do_ROI;
     Params.num_roi = P.number_ROIs;
     Params.roi = P.roi_limits;
-    Params.arena_floor = P.arena_floor;
+
     Params.plotSpace = P.viewSpatialTrajectory;
     Params.plotSpaceTime = P.viewSpatioTemporalTrajectory;
     Params.plotBeh = P.viewBehaviorLocations;
     Params.do_events = P.do_events;
-    Params.do_wallrearing_classifier = P.do_wallrearing_classifier;
-    Params.do_freezing_classifier = P.do_freezing_classifier;
-    Params.do_moving_classifier = P.do_movement_classifier;
+    %% Rearing Params
+%     Params.do_wallrearing_classifier = P.do_wallrearing_classifier;
+%     Params.arena_floor = P.arena_floor;
+%     Params.Rearing.minDuration = 0.1; % Default, cut off events less than 100ms
+    %% Moving Params
+    %% Misc Params
     Params.px2cm = round(P.px2cm);
-    Params.Freezing.sensitivityGain = P.freezing_sensitivityGain;
-    Params.Moving.minSpeed = P.moving_minSpeed;
     Params.cueFile = [];
-    Params.batch = P.batch;
-    Params.reuse_cue_name = P.reuse_cue_name;
+    Params.batchSession = P.batchSession;
+    if P.batchSession == 1
+        Params.reuse_cue_name = P.reuse_cue_name;
+    end
 end

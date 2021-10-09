@@ -57,13 +57,7 @@ else
     m2_data = Metrics.(m2{1});
 end
 
-% Load data from hB file
-% cd(hB_filepath)
-% hB_search = dir('hB*');
-% if size(hB_search, 1) == 1
-%     load(hB_search.name)
-% end
-
+% Load human annotations
 load([hB_path, hB_file])
 
 % Extract behaviors from hB struct
@@ -81,7 +75,7 @@ end
 % Prompt user to choose behavior from hB file
 hB_ind = listdlg('PromptString', {'Select behavior to examine.'}, 'ListString', hB_behavs, 'SelectionMode', 'single');
 behav = hB_behavs(hB_ind);
-behav_vector = logical(hBehavior.(behav).Vector)';
+behav_vector = logical(hBehavior.(behav).Vector);
 cmp_vector = ~behav_vector;
 
 % Split hB data in behavior / not-behavior datasets
@@ -141,7 +135,7 @@ end
 
 %% FIGURE 1: Comparative Histograms Labeled by Behavior
 if subset
-    f1 = figure(1);
+    f1 = figure();
     subplot(2,1,1)
     histogram(m1_behav_Z_subset, 'EdgeColor', 'blue', 'FaceColor', 'blue', 'FaceAlpha', 0.5)
     title([m1, 'Z Behavior v Non-Behavior Frames']);
@@ -155,7 +149,7 @@ if subset
     histogram(m2_cmp_Z, 'EdgeColor', 'red', 'FaceColor', 'red', 'FaceAlpha', 0.2)
     legend('Behavior','Non-Behavior')
 else
-    f1 = figure(1);
+    f1 = figure();
     subplot(2,1,1)
     histogram(m1_behav_Z, 'EdgeColor', 'blue', 'FaceColor', 'blue', 'FaceAlpha', 0.5)
     title([m1, 'Z Behavior v Non-Behavior Frames']);
@@ -173,7 +167,7 @@ end
 %% FIGURE 2: Comparative Z-Scored Boxplots
 
 if subset
-    f2 = figure(2);
+    f2 = figure();
     data = [m1_Z, m1_behav_Z_subset, m1_cmp_Z]';
     g1 = repmat({'All'},length(m1_Z),1);
     g2 = repmat({'Behavior'},length(m1_behav_Z_subset),1);
@@ -192,7 +186,7 @@ if subset
     boxplot(data, g)
     title([m2{1}, ': Z Score Distributions'])
 else
-    f2 = figure(2);
+    f2 = figure();
     data = [m1_Z, m1_behav_Z, m1_cmp_Z_subset]';
     g1 = repmat({'All'},length(m1_Z),1);
     g2 = repmat({'Behavior'},length(m1_behav_Z),1);
@@ -248,7 +242,7 @@ for i1 = 1:length(m1_vals_to_test)
     end
 end
 
-f3 = figure(3);
+f3 = figure();
 heatmap({'Mean-2SD', 'Mean-1SD', 'Mean', 'Mean+1SD', 'Mean+2SD'}, {'Mean-2SD', 'Mean-1SD', 'Mean', 'Mean+1SD', 'Mean+2SD'}, predictions)
 title('Estimated Probability of Behavior')
 ylabel(m1)

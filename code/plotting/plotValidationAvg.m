@@ -13,10 +13,10 @@ for i = 1:size(data, 2)
     hold on;
 end
 xticks([1:size(data,2)]);
-min_data = min(min(data));
-min_data = 0.98*min_data;
 xticklabels({'Precision', 'Recall', 'F1 Score', 'Specificity'})
 title(['Average ' VResults.ValidationBehavior, ' Performance'])
+min_data = min(min(data));
+min_data = 0.98*min_data;
 ylim([min_data 1])
 
 end
