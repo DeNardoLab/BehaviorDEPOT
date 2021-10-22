@@ -98,6 +98,7 @@ for j = 1:size(P.video_folder_list, 1)
     classifier_list = P.classifierNames(P.classSelect);
     beh_names = P.behavior_names(P.classSelect);
     class_handles = cellfun(@str2func, classifier_list, 'UniformOutput', false);
+    Behavior = struct();
     
     for i = 1:size(class_handles, 1)
         this_classifier = class_handles{i};
