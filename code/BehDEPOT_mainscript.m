@@ -105,10 +105,9 @@ for j = 1:size(P.video_folder_list, 1)
         Behavior.(beh_names{i}) = this_classifier(Params, Tracking, Metrics);
     end
     
-    %% APPLY FILTERS TO BEHAVIORS
-    if (Params.do_roi && Params.num_roi > 0) | (Params.do_events)
-        Behavior_Filter = struct;  % separate struct to hold filtered behavior
-    end
+    %% APPLY FILTERS TO BEHAVIORS (INITIALIZE Behavior_Filter)
+
+    Behavior_Filter = struct;  % separate struct to hold filtered behavior
     
     %% APPLY SPATIAL FILTER
     % separate behavior within and outside ROI
@@ -141,7 +140,8 @@ for j = 1:size(P.video_folder_list, 1)
     end
    
     %% VISUALIZATIONS
-    % plot freezing bouts
+    % Plot Behavior Bouts
+    if size(fieldnames(Behavior), 1) > 0
     plotBouts(Behavior, analyzed_folder_name);
     
     % plot trajectory map
