@@ -6,16 +6,19 @@
 %FUNCTION: save structures as MATLAB files
 
 function saveAnalysis(analyzed_folder_name, Params, Tracking, Metrics, Behavior, Behavior_Filter)
-
-    mkdir([analyzed_folder_name]);
+    mkdir(analyzed_folder_name);
     cd(analyzed_folder_name)
     save('Tracking.mat', 'Tracking');
-    save('Behavior.mat', 'Behavior');
     save('Metrics.mat', 'Metrics');
     save('Params.mat', 'Params');
-    save('Behavior_Filter.mat', 'Behavior_Filter');
-    %savefig(Plots.pointValidation, 'Point Validation');
-    %savefig(Plots.bouts, 'Behavior Bouts');
-    %savefig(Plots.behavior, 'Behavior Map');
+    
+    if size(fieldnames(Behavior), 1) > 0
+        save('Behavior.mat', 'Behavior');
+    end
+
+    if size(fieldnames(Behavior_Filter), 1) > 0
+        save('Behavior_Filter.mat', 'Behavior_Filter');
+    end
+
     close all
 end

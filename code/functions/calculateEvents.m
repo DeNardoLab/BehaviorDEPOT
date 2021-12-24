@@ -1,8 +1,7 @@
-function [out, Params, P] = calculateEvents(Behavior, Params, P)
+function [output, Params, P] = calculateEvents(Behavior, Params, P)
     
     tmpbeh = struct2cell(Behavior);
-    numframes = length(tmpbeh{1}.Vector);
-    
+    numframes = Params.numFrames;
     
     % prompt for number of timestamp files
     tf = 0;
@@ -53,9 +52,9 @@ function [out, Params, P] = calculateEvents(Behavior, Params, P)
         end
 
         % convert event times to vector
-        event_vec = zeros(numframes,1);
+        event_vec = zeros(1,numframes);
         for i = 1:size(eventmat,1)
-            event_vec(eventmat(i,1):eventmat(i,2),1) = 1;
+            event_vec(1, eventmat(i,1):eventmat(i,2)) = 1;
         end
 
         % loop through behaviors 
@@ -71,22 +70,22 @@ function [out, Params, P] = calculateEvents(Behavior, Params, P)
             in_event_beh_vec(in_event_beh) = 1;
             per_event_beh = sum(in_event_beh_vec) / sum(i_beh_vec);
 
-            out.(eventname).EventVector = event_vec;
-            out.(eventname).EventBouts = eventmat;
-            out.(eventname).(i_beh_name).BehInEventVector = in_event_beh_vec;
+            output.(eventname).EventVector = event_vec;
+            output.(eventname).EventBouts = eventmat;
+            output.(eventname).(i_beh_name).BehInEventVector = in_event_beh_vec;
             
-            out.(eventname).(i_beh_name).Cue_BehInEventVector = [];
+            output.(eventname).(i_beh_name).Cue_BehInEventVector = [];
             for cue = 1:size(eventmat,1)
                 this_cue = in_event_beh_vec(eventmat(cue,1):eventmat(cue,2))';
-                out.(eventname).(i_beh_name).Cue_BehInEventVector = [out.(eventname).(i_beh_name).Cue_BehInEventVector; this_cue];
+                output.(eventname).(i_beh_name).Cue_BehInEventVector = [output.(eventname).(i_beh_name).Cue_BehInEventVector; this_cue];
             end
-            out.(eventname).(i_beh_name).PerBehInEvent = per_event_beh;
+            output.(eventname).(i_beh_name).PerBehInEvent = per_event_beh;
             
             for j = 1:size(eventmat,1)
                 j_beh_vec = i_beh_vec(eventmat(j,1):eventmat(j,2));
                 stats{j} = sum(j_beh_vec) / length(j_beh_vec);                
             end
-            out.(eventname).(i_beh_name).PerBehDuringCue = stats;
+            output.(eventname).(i_beh_name).PerBehDuringCue = stats;
         end
     end
 end

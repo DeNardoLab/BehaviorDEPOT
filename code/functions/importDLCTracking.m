@@ -1,7 +1,7 @@
 %importDLCTracking
 
-%INPUT: P (batch parameter structure)
-%OUTPUT: data (generic variable containing imported DLC data)
+%INPUT: Params (session parameters structure)
+%OUTPUT: data, Params (generic variable containing imported DLC data)
 %FUNCTION: import DLC CSV/H5 file  
 
 function [data, Params] = importDLCTracking(Params)
@@ -19,10 +19,19 @@ function [data, Params] = importDLCTracking(Params)
             if length(S) > 1  % differentiate cue and tracking csv files
                 if contains(S(1).name, 'cue')
                     trackfile = 2;
-                    Params.cueFile = [S(1).folder '\' S(1).name];
+                    if ispc
+                        Params.cueFile = [S(1).folder '\' S(1).name];
+                    else
+                        Params.cueFile = [S(1).folder '/' S(1).name];
+                    end
+                    
                 elseif contains(S(2).name, 'cue')
                     trackfile = 1;
-                    Params.cueFile = [S(2).folder '\' S(2).name];
+                    if ispc
+                        Params.cueFile = [S(2).folder '\' S(2).name];
+                    else
+                        Params.cueFile = [S(2).folder '/' S(2).name];
+                    end
                 else
                     disp('Error. Too many .csv files in the folder. Folder should only contain tracking .csv file, and optionally a .csv file for cues');
                 end

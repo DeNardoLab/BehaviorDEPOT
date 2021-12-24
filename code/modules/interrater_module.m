@@ -24,7 +24,10 @@ hB_search = dir(hB_ID);
 hB_names = {};
 names = {};
 for i = 1:size(hB_search,1)
-    hB_files{i} = [hB_search(i).folder '\' hB_search(i).name];
+    if ~ispc
+        hB_files{i} = [hB_search(i).folder '/' hB_search(i).name];
+    else
+        hB_files{i} = [hB_search(i).folder '\' hB_search(i).name];
     prompt = {['Assign name to rater file: ' hB_search(i).name]};  
     dlgtitle = 'Input';
     dims = [1 40];
@@ -33,14 +36,23 @@ for i = 1:size(hB_search,1)
     hB_names{i} = string(i_name);
 end
 
-for i = 1:size(analyzed_search, 1)
-    analyzed_files{i} = [analyzed_search(i).folder '\' analyzed_search(i).name '\Behavior.mat'];
-    prompt = {['Assign name to rater file: ' analyzed_search(i).name]};
-    dlgtitle = 'Input';
-    dims = [1 40];
-    definput = {''};
-    i_name = inputdlg(prompt,dlgtitle,dims,definput);
-    analyzed_names{i} = string(i_name);
+if size(analyzed_search, 1) >= 1
+    for i = 1:size(analyzed_search, 1)
+        if ~ispc
+            analyzed_files{i} = [analyzed_search(i).folder '/' analyzed_search(i).name '/Behavior.mat'];
+        else
+            analyzed_files{i} = [analyzed_search(i).folder '\' analyzed_search(i).name '\Behavior.mat'];
+        end
+        prompt = {['Assign name to rater file: ' analyzed_search(i).name]};
+        dlgtitle = 'Input';
+        dims = [1 40];
+        definput = {''};
+        i_name = inputdlg(prompt,dlgtitle,dims,definput);
+        analyzed_names{i} = string(i_name);
+    end
+else
+    analyzed_files = {};
+    analyzed_names = {};
 end
 
 files = [hB_files, analyzed_files];
@@ -252,7 +264,7 @@ for b = 1:length(behav_selected)
     
     %% Calculate and Report Regions with Large Consecutive Errors (relative to reference)
 
-    if generate_error_tables == 1
+    if generate_error_tables
         %Generate error structures
         %Log behavior in title (save all files in a single directory)
 
@@ -323,7 +335,7 @@ for b = 1:length(behav_selected)
         %% Sort table by span length (largest to smallest)
 
         for j = 1:length(data)
-
+            skip = 0;
             %Assemble table (per user)
             if isempty(p) & ~isempty(n)
                 Start = [errors(2,j).start]';
@@ -340,6 +352,7 @@ for b = 1:length(behav_selected)
                 Type = [type_fp]';
                 error_table = table(Start, Stop, Length, Type);
             elseif isempty(p) & isempty(n)
+                skip = 1;
             else
                 Start = [errors(1,j).start, errors(2,j).start]';
                 Stop = [errors(1,j).stop, errors(2,j).stop]';
@@ -350,6 +363,7 @@ for b = 1:length(behav_selected)
                 error_table = table(Start, Stop, Length, Type);
             end
             
+            if ~skip
             %Sort table
             [~, sort_order] = sortrows(error_table.Length, 'descend');
             error_table = error_table(sort_order,:);
@@ -364,7 +378,8 @@ for b = 1:length(behav_selected)
             end
             writetable(error_table, filename)
             cd(working_directory)
-            clearvars Start Stop Length Type type_fn type_fp sort_order error_table filename
+            end
+            clearvars Start Stop Length Type type_fn type_fp sort_order error_table filename skip
         end
     end
 end

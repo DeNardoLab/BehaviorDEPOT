@@ -17,15 +17,26 @@
     % 1. Unnamed structure containing results
 function classifier_optimization_module()
 %% Initialization - Set required inputs
-
 generate_heatmap = 1;
+if ~ispc
+    menu('Select a BehDEPOT folder (_analyzed) to use for exploration', 'OK')
+end
 analyzed_filepath = uigetdir('','Select a BehDEPOT folder (_analyzed) to use for optimization');
+
+if ~ispc
+    menu('Select a hB file (output from convertHumanAnnotations.m)', 'OK')
+end
 [hB_file, hB_path] = uigetfile('','Select a hB file (output from convertHumanAnnotations.m)');
 
 %% Main Script
-
 module_path = mfilename('fullpath');
-mp_slash = strfind(module_path, "\");
+
+if ispc
+    mp_slash = strfind(module_path, "\");
+else
+    mp_slash = strfind(module_path, "/");
+end
+
 app_path = module_path(1:mp_slash(end-1));
 class_path = [app_path, 'classifiers'];
 
@@ -58,12 +69,19 @@ ref = hBehavior.(behavior_to_test).Vector;
 cd(class_path)
 class_search = dir;
 class_search(1:2) = [];
+classifier_names = {};
+c = 1;
 
 for i = 1:size(class_search, 1)
-    classifier_names{i} = class_search(i).name;
+    % Remove param files
+    if ~startsWith(class_search(i).name, 'P_')
+        classifier_names{c} = class_search(i).name;
+        c = c + 1;
+    end
 end
 
 % Prompt User to choose classifier
+disp('Select classifier file to test.')
 class_ind = listdlg('PromptString', {'Select classifier file to test.'}, 'ListString', classifier_names, 'SelectionMode', 'single');
 classifier = classifier_names{class_ind};
 classifier_noext = extractBefore(classifier, ".");
@@ -122,8 +140,11 @@ for p1 = 1:length(thresh1_values)
     testParams.(behavior_to_test).(thresh1{1}) = thresh1_values(p1);
     for p2 = 1:length(thresh2_values)
         testParams.(behavior_to_test).(thresh2{1}) = thresh2_values(p2); 
-        testBehavior = class_fn(Metrics, testParams);
+        testBehavior = class_fn(testParams, Tracking, Metrics);
         cmp = testBehavior.Vector;
+        if size(cmp, 2) > size(cmp, 1)
+            cmp = cmp';
+        end
         error = ref - cmp;
         tp = zeros(length(error),1);
         tn = zeros(length(error),1);
@@ -149,7 +170,13 @@ for p1 = 1:length(thresh1_values)
         
     end
 end
- 
+
+%% Prep Save Folder
+save_path = Params.basedir;
+cd(save_path)
+mkdir('Optimization_Results')
+cd('Optimization_Results')
+
 %% FIGURES 1 & 2: Generate Heatmaps of F1 Scores versus parameter value
 if generate_heatmap
     f1 = figure(1);
@@ -163,11 +190,16 @@ if generate_heatmap
     xlabel(thresh2)
     ylabel(thresh1)
     title('Recall')
+    savefig(f1, 'Precision_Recall')
+    close(f1)
+    
     f2 = figure(2);
     heatmap(compose('%.2f',thresh2_values), compose('%.2f',thresh1_values), f1_score)
     xlabel(thresh2)
     ylabel(thresh1)
     title('F1 Score')
+    savefig(f2, 'F1_Scores')
+    close(f2)
 end
 
 %% Organize Data into oResults structure
@@ -185,34 +217,12 @@ oResults.f1_score = f1_score;
 
 %% Save oResults structure and any relevant visualizations
 
-save_path = Params.basedir;
-cd(save_path)
-mkdir('Optimization_Results')
-cd('Optimization_Results')
-
 results_filename = 'oResults';
 results_filename_ext = strcat(results_filename, '.mat');
-
-savefig(f1, 'Precision_Recall')
-savefig(f2, 'F1_Scores')
 save(results_filename_ext, 'oResults')
-
-%% ROC curves
-[Xlog, Ylog, Tlog, AUClog] = perfcurve(cmp, ref, 1); % Tlog = threshold values; AUC = area under curve
-AUC = num2str(AUClog);
-
-% plot
-figure();
-plot(Xlog, Ylog, 'k', 'LineWidth', 1.5);
-xlabel('False positive rate');
-ylabel('True positive rate');
-title('ROC Curves for Classification by Logistic Regression');
-annotation('textbox', [0.6,0.55,0.3,0], 'string', 'AUC values','FontWeight','bold','LineStyle','none');
-annotation('textbox', [0.6,0.5,0,0], 'string', AUC,'Color','k');
 
 %% TO DO:
 % When using 1 parameter, fix resulting visualizations (p2 overrides)
 % p1--eliminate p1 axis values?
-% Load classifier from codebase
-
+% Integrate ROC curves
 end
