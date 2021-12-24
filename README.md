@@ -18,9 +18,11 @@
 - Re-work classifier files to use separate 'P_' files to store parameters
 - Write a function that can apply a minDuration threshold to selected Behavior data
 - Edit GUI to allow custom classifier usage
+- Update code for MAC/Linux compatibility
 - Add convertHumanAnnotations functionality to GUI
-- Update convertHumanAnnotations_BD code
+- Update convertHumanAnnotations_BD code for CSV/MAT compatibility
 - Update Metrics structure; make more straightforward to add or modify metrics
+- Fix error in acceleration calculations
 - Merge mainscript files
 - Add new metrics to calculateMetrics
 - Clean up metric naming in calculateMetrics
