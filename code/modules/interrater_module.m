@@ -24,7 +24,10 @@ hB_search = dir(hB_ID);
 hB_names = {};
 names = {};
 for i = 1:size(hB_search,1)
-    hB_files{i} = [hB_search(i).folder '\' hB_search(i).name];
+    if ~ispc
+        hB_files{i} = [hB_search(i).folder '/' hB_search(i).name];
+    else
+        hB_files{i} = [hB_search(i).folder '\' hB_search(i).name];
     prompt = {['Assign name to rater file: ' hB_search(i).name]};  
     dlgtitle = 'Input';
     dims = [1 40];
@@ -35,7 +38,11 @@ end
 
 if size(analyzed_search, 1) >= 1
     for i = 1:size(analyzed_search, 1)
-        analyzed_files{i} = [analyzed_search(i).folder '\' analyzed_search(i).name '\Behavior.mat'];
+        if ~ispc
+            analyzed_files{i} = [analyzed_search(i).folder '/' analyzed_search(i).name '/Behavior.mat'];
+        else
+            analyzed_files{i} = [analyzed_search(i).folder '\' analyzed_search(i).name '\Behavior.mat'];
+        end
         prompt = {['Assign name to rater file: ' analyzed_search(i).name]};
         dlgtitle = 'Input';
         dims = [1 40];

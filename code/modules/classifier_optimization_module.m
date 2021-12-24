@@ -17,15 +17,26 @@
     % 1. Unnamed structure containing results
 function classifier_optimization_module()
 %% Initialization - Set required inputs
-
 generate_heatmap = 1;
+if ~ispc
+    menu('Select a BehDEPOT folder (_analyzed) to use for exploration', 'OK')
+end
 analyzed_filepath = uigetdir('','Select a BehDEPOT folder (_analyzed) to use for optimization');
+
+if ~ispc
+    menu('Select a hB file (output from convertHumanAnnotations.m)', 'OK')
+end
 [hB_file, hB_path] = uigetfile('','Select a hB file (output from convertHumanAnnotations.m)');
 
 %% Main Script
-
 module_path = mfilename('fullpath');
-mp_slash = strfind(module_path, "\");
+
+if ispc
+    mp_slash = strfind(module_path, "\");
+else
+    mp_slash = strfind(module_path, "/");
+end
+
 app_path = module_path(1:mp_slash(end-1));
 class_path = [app_path, 'classifiers'];
 
@@ -131,6 +142,9 @@ for p1 = 1:length(thresh1_values)
         testParams.(behavior_to_test).(thresh2{1}) = thresh2_values(p2); 
         testBehavior = class_fn(testParams, Tracking, Metrics);
         cmp = testBehavior.Vector;
+        if size(cmp, 2) > size(cmp, 1)
+            cmp = cmp';
+        end
         error = ref - cmp;
         tp = zeros(length(error),1);
         tn = zeros(length(error),1);
@@ -156,7 +170,13 @@ for p1 = 1:length(thresh1_values)
         
     end
 end
- 
+
+%% Prep Save Folder
+save_path = Params.basedir;
+cd(save_path)
+mkdir('Optimization_Results')
+cd('Optimization_Results')
+
 %% FIGURES 1 & 2: Generate Heatmaps of F1 Scores versus parameter value
 if generate_heatmap
     f1 = figure(1);
@@ -170,11 +190,16 @@ if generate_heatmap
     xlabel(thresh2)
     ylabel(thresh1)
     title('Recall')
+    savefig(f1, 'Precision_Recall')
+    close(f1)
+    
     f2 = figure(2);
     heatmap(compose('%.2f',thresh2_values), compose('%.2f',thresh1_values), f1_score)
     xlabel(thresh2)
     ylabel(thresh1)
     title('F1 Score')
+    savefig(f2, 'F1_Scores')
+    close(f2)
 end
 
 %% Organize Data into oResults structure
@@ -192,16 +217,8 @@ oResults.f1_score = f1_score;
 
 %% Save oResults structure and any relevant visualizations
 
-save_path = Params.basedir;
-cd(save_path)
-mkdir('Optimization_Results')
-cd('Optimization_Results')
-
 results_filename = 'oResults';
 results_filename_ext = strcat(results_filename, '.mat');
-
-savefig(f1, 'Precision_Recall')
-savefig(f2, 'F1_Scores')
 save(results_filename_ext, 'oResults')
 
 %% TO DO:

@@ -47,9 +47,7 @@ function beh_plot = plotTrajectoryMap(Metrics, frame1, Params, Behavior, analyze
             savename = strcat(i_beh_name, ' Map');
             savefig(beh_plot, (savename));
         end
-            
-           
-            
+                  
     elseif Params.plotSpaceTime
         figure;
         I = imshow(frame1);

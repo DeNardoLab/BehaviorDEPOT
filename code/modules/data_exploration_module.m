@@ -18,7 +18,15 @@ function data_exploration_module()
 %% Initialize Required Inputs
 
 % Set input variables
+if ~ispc
+    menu('Select a BehDEPOT folder (_analyzed) to use for exploration', 'OK')
+end
 analyzed_filepath = uigetdir('', 'Select a BehDEPOT folder (_analyzed) to use for exploration');
+
+if ~ispc
+    menu('Select a hB file (output from convertHumanAnnotations.m)', 'OK')
+end
+
 [hB_file, hB_path] = uigetfile('','Select a hB file (output from convertHumanAnnotations.m)');
 %save_filepath = ''; 
 save_model = 1;
@@ -228,8 +236,8 @@ m2_cmp_mahal_mean = mean(m2_cmp_mahal);
 %% FIGURE 3: Behavior Probability Estimates from GLM
 
 % Generate generalized linear model using selected metrics
-tbl = table(abs(m1_data)', abs(m2_data)', behav_vector');
-mdl_spec = 'Var3 ~ Var1*Var2 - Var1:Var2';
+tbl = table(abs(m1_data)', abs(m2_data)', behav_vector);
+mdl_spec = 'behav_vector ~ Var1*Var2 - Var1:Var2';
 mdl = fitglm(tbl, mdl_spec, 'Distribution', 'binomial')
 
 m1_vals_to_test = [m1_mean-2*m1_SD, m1_mean-m1_SD, m1_mean, m1_mean+m1_SD, m1_mean+2*m1_SD];
@@ -263,8 +271,8 @@ Z_SD = [m1_behav_Z_SD, m1_cmp_Z_SD, m2_behav_Z_SD, m2_cmp_Z_SD]';
 Mahalanobis = [m1_behav_mahal_mean, m1_cmp_mahal_mean, m2_behav_mahal_mean, m2_cmp_mahal_mean]';
 
 results_table = table(Name, Mean, SD, Z_Mean, Z_SD, Mahalanobis);
-%% Save Figures and Table
 
+%% Save Figures and Table
 save_path = Params.basedir;
 cd(save_path)
 mkdir('DE_Results')

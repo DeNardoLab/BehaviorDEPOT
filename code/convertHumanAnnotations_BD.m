@@ -15,17 +15,46 @@
 
 function convertHumanAnnotations_BD()
     
-    [table_filename, table_path] = uigetfile('', 'Select Matlab file with table to convert');
+    if ~ispc
+        menu('Select .mat or .csv file with annotations to convert', 'OK')
+    end
+    
+    [data_filename, data_path] = uigetfile({'*.mat'; '*.csv'}, 'Select .mat or .csv file with annotations to convert');
     total_frames = input('Type total number of frames in video');
 
     % Load Params from MATLAB analysis script OR set total_frames to the total number of video frame
-    
     base_dir = pwd;
+    cd(data_path)
     
-    cd(table_path)
+    [~, name, type] = fileparts(data_filename);
     
-    human_labels = load([table_path, table_filename]);
-    
+    if strcmpi(type, '.mat')
+        human_labels = load([data_path, data_filename]);
+    elseif strcmpi(type, '.csv')
+        T = readtable([data_path, data_filename]);
+        table_vars = T.Properties.VariableNames;
+        all_ptrns = {'Start', 'Stop', 'End', 'Behavior'};
+        
+        for i = 1:size(all_ptrns, 2)
+            ptrn = all_ptrns{i};
+            var_search = contains(table_vars, ptrn, 'IgnoreCase', true);
+            if sum(var_search) == 1
+                var_ind = find(var_search);
+                
+                if i == 1
+                    Start = table2array(T(:, var_ind));
+                elseif i == 2 || i == 3
+                    Stop = table2array(T(:, var_ind));
+                elseif i == 4
+                    Behavior = categorical(table2array(T(:, var_ind)));
+                end
+            end
+        end
+        
+        new_csv_table = table(Start, Stop, Behavior);
+        human_labels.data = new_csv_table;
+    end
+        
     if ~exist('total_frames')
         % Grab information from video file
         vid_dir = dir('*.avi');
@@ -33,7 +62,7 @@ function convertHumanAnnotations_BD()
         if size(vid_dir, 1) == 0
             vid_dir = dir('*.mp4');
         elseif size(vid_dir, 1) > 1
-            vid_search = strcat(table_filename(1:6), '*.avi');
+            vid_search = strcat(data_filename(1:6), '*.avi');
             vid_dir = dir(vid_search);
         end
 
@@ -123,7 +152,7 @@ function convertHumanAnnotations_BD()
         output_filename = strcat(output_filename, '.mat')
         save(output_filename, 'hBehavior')
     else
-        new_struct_name = strcat('hB_', table_filename, '.mat')
+        new_struct_name = strcat('hB_', name, '.mat')
         save(new_struct_name, 'hBehavior')
     end
     

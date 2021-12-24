@@ -23,11 +23,7 @@ function Params = makeParamsStruct(P)
     Params.plotSpaceTime = P.viewSpatioTemporalTrajectory;
     Params.plotBeh = P.viewBehaviorLocations;
     Params.do_events = P.do_events;
-    %% Rearing Params
-%     Params.do_wallrearing_classifier = P.do_wallrearing_classifier;
-%     Params.arena_floor = P.arena_floor;
-%     Params.Rearing.minDuration = 0.1; % Default, cut off events less than 100ms
-    %% Moving Params
+
     %% Misc Params
     Params.px2cm = round(P.px2cm);
     Params.cueFile = [];

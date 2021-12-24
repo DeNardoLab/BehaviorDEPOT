@@ -6,7 +6,7 @@ function validation_module()
 %% Initialization - Required Inputs
 hB_ID = 'hB*'; %Identifier for human annotation files
 analyzed_ID = '*_analyzed';
-msgbox('Select directory containing folders with paired hB files (output from convertHumanAnnotations) and BehDEPOT "_analyzed" folders')
+menu('Select directory containing folders with paired hB files (output from convertHumanAnnotations) and BehDEPOT "_analyzed" folders', 'OK')
 pause(2);
 data_directory = uigetdir('','Select directory containing data folders with hB and Behavior files');
 homedir = pwd;
@@ -146,9 +146,11 @@ cd(results_folder)
 % Plot and Save Figures
 fig1 = plotValidationPerformance(VResults);
 saveas(fig1, 'PerformanceByVideo.jpg')
+close(fig1)
 
 fig2 = plotValidationAvg(VResults);
 saveas(fig2, 'AvgPerformance.jpg')
+close(fig2)
 
 results_filename_ext = strcat(behav_to_validate,'_Validation', '.mat');
 save(results_filename_ext, 'VResults')

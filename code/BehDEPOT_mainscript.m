@@ -4,9 +4,15 @@ function BehDEPOT_mainscript(P)
 if P.batchSession == 0
     P.script_dir = pwd; % directory with script files (avoids requiring changes to path)
     disp('Select tracking file'); % point to folder for analysis
+    if ~ispc
+        menu('Select tracking file', 'OK')
+    end
     [ft pt] = uigetfile('*.*','Select tracking file');
     cd(pt)
     disp('Select video file'); % point to folder for analysis
+    if ~ispc
+        menu('Select video file', 'OK')
+    end
     [fv pv] = uigetfile('*.*','Select video file');
     basedir = pt;
     P.tracking_file = [pt ft];
@@ -19,6 +25,9 @@ elseif P.batchSession == 1
 % Collect 'video_folder_list' from 'P.video_directory'
     P.script_dir = pwd; % directory with script files (avoids requiring changes to path)
     disp('Select directory containing other directories for analysis'); % point to folder for analysis
+    if ~ispc
+        menu('Select the directory containing folders for analysis', 'OK')
+    end
     P.video_directory = uigetdir('','Select the directory containing folders for analysis'); %Directory with list of folders containing videos + tracking to analyze
     P.video_folder_list = prepBatch(string(P.video_directory)); %Generate list of videos to analyze
     P.part_save = [];
@@ -27,12 +36,18 @@ elseif P.batchSession == 1
 end
 
 %% Run main script
-for j = 1:size(P.video_folder_list, 1)
-    % 
+for j = 1:size(P.video_folder_list, 2)
+    % Initialize batch session specific parameters
     if P.batchSession == 1
         % Initialize 
-        current_video = P.video_folder_list(j);    
-        video_folder = strcat(P.video_directory, '\', current_video);
+        current_video = P.video_folder_list(j);
+        
+        if ispc
+            video_folder = strcat(P.video_directory, '\', current_video);
+        else
+            video_folder = strcat(P.video_directory, '/', current_video);
+        end
+        
         cd(video_folder) %Folder with data files
         basedir = pwd; %Assign current folder to basedir
 
@@ -41,7 +56,7 @@ for j = 1:size(P.video_folder_list, 1)
         elseif size(dir('*.mp4'), 1) == 1
             vid_extension = '*.mp4';
         else
-            disp('Video Not Recognized. Ensure a single video file (avi/mp4) is in each session folder in the batch directory')
+            disp('ERROR: Video Not Recognized. Ensure a single video file (avi/mp4) is in each session folder in the batch directory')
             return
         end
         
@@ -64,7 +79,13 @@ for j = 1:size(P.video_folder_list, 1)
         cd(P.script_dir)
     
         % Collect frames for plots and draw ROIs
-        [frame, frame1, frame_idx, P] = videoInterface(strcat(video_folder,'\',video_name), P);
+        if ispc
+            full_vid_path = strcat(video_folder,'\',video_name);
+        else
+            full_vid_path = strcat(video_folder,'/',video_name);
+        end
+        
+        [frame, frame1, frame_idx, P] = videoInterface(full_vid_path, P);
     end
     %% Save parameters to Params structure
     Params = makeParamsStruct(P);    
@@ -94,7 +115,6 @@ for j = 1:size(P.video_folder_list, 1)
     [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P);
  
     %% RUN BEHAVIOR CLASSIFIERS 
-    
     classifier_list = P.classifierNames(P.classSelect);
     beh_names = P.behavior_names(P.classSelect);
     class_handles = cellfun(@str2func, classifier_list, 'UniformOutput', false);
@@ -105,11 +125,10 @@ for j = 1:size(P.video_folder_list, 1)
         Behavior.(beh_names{i}) = this_classifier(Params, Tracking, Metrics);
     end
     
-    %% APPLY FILTERS TO BEHAVIORS (INITIALIZE Behavior_Filter)
-
+    % Initialize Behavior_Filter
     Behavior_Filter = struct;  % separate struct to hold filtered behavior
     
-    %% APPLY SPATIAL FILTER
+    %% APPLY SPATIAL FILTER(S)
     % separate behavior within and outside ROI
     if Params.do_roi && Params.num_roi > 0
         Behavior_Filter.Spatial = calculateROI(Behavior, Metrics, Params);
@@ -123,12 +142,16 @@ for j = 1:size(P.video_folder_list, 1)
     
    %% INTERSECT SPATIAL AND TEMPORAL FILTERS
     if Params.do_roi && Params.do_events
-      Behavior_Filter.Intersect = filterIntersect(Behavior, Behavior_Filter, Params);
+        Behavior_Filter.Intersect = filterIntersect(Behavior, Behavior_Filter, Params);
     end
         
     %% Save Data
     if P.batchSession == 1
-        analyzed_folder_name = strcat(basedir, '\', current_video, '_analyzed');
+        if ispc
+            analyzed_folder_name = strcat(basedir, '\', current_video, '_analyzed');
+        else
+            analyzed_folder_name = strcat(basedir, '/', current_video, '_analyzed');
+        end
     else
         analyzed_folder_name = string([P.video_file,'_analyzed']);
     end
@@ -147,13 +170,14 @@ for j = 1:size(P.video_folder_list, 1)
     % plot trajectory map
     plotTrajectoryMap(Metrics, frame1, Params, Behavior, analyzed_folder_name);
     
-    if P.batchSession == 1
-        % reset for next batch
-        clearvars -except j P;
-        disp(['Analyzed ' num2str(j) ' of ' num2str(length(P.video_folder_list))])
-        close;
+    % Prep for next session (if batch)
+        if P.batchSession == 1
+            % reset for next batch
+            clearvars -except j P;
+            disp(['Analyzed ' num2str(j) ' of ' num2str(length(P.video_folder_list))])
+            close;
+        end
     end
-end
-disp('Analysis completed. Results stored in data folders.')
-close;
+    disp('Analysis completed. Results stored in data folders.')
+    close;
 end

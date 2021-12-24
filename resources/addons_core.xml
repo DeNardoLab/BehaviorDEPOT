@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addonCore>
-  <label>BehaviorDEPOT_0.50</label>
-  <version>0.50</version>
+  <label>BehaviorDEPOT</label>
+  <version>1.0</version>
   <type>app</type>
   <packagedBy>(R2020a)</packagedBy>
-  <identifier>8a1121d6-3da2-4ae6-a669-0390faa0b6a4</identifier>
+  <identifier>786e8f67-a371-44fa-8876-10a81a869d58</identifier>
+  <summary>BehaviorDEPOT v1.0 application for analyzing top-down rodent DLC tracking and automatic behavior classification</summary>
+  <createdBy name="C. Gabriel, Z. Zeidler, B. Jin, L. DeNardo" email="cjgabrie@g.ucla.edu"/>
   <image>resources/screenshot.png</image>
   <icons>
     <icon tag="0">resources/icon_48.png</icon>

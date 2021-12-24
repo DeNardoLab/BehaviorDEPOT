@@ -1,7 +1,7 @@
-classdef BehaviorDEPOT_050App < handle
+classdef BehaviorDEPOTApp < handle
     %
     % Usage:
-    %     app.BehaviorDEPOT_050App
+    %     app.BehaviorDEPOTApp
     
     properties
         AppHandle;
@@ -11,8 +11,8 @@ classdef BehaviorDEPOT_050App < handle
     end
     
     properties (Constant)
-        AppPathBase = {'/BehaviorDEPOT_050'};
-        AppClass = 'BehaviorDEPOT_050App';
+        AppPathBase = {'/BehaviorDEPOT'};
+        AppClass = 'BehaviorDEPOTApp';
         Increment = 1;
         Decrement = 0;
         Version = '13a';
@@ -43,7 +43,7 @@ classdef BehaviorDEPOT_050App < handle
     
     methods
         % Create the application object
-        function obj = BehaviorDEPOT_050App()
+        function obj = BehaviorDEPOTApp()
             obj.CurrClass = metaclass(obj);
             startApp(obj)
         end
@@ -57,12 +57,12 @@ classdef BehaviorDEPOT_050App < handle
         function startApp(obj)
             % Increment the reference count by one and lock the file
             mlock;
-            BehaviorDEPOT_050App.refcount(obj.Increment);
+            BehaviorDEPOTApp.refcount(obj.Increment);
             
             % Verify we are about to execute the correct function - if not we
             % should error and exit now.  We need to make sure the paths are
             % equal using canonical paths.
-            existVal = exist(fullfile(pwd,'BehDep_GUI_current')); %#ok<EXIST>
+            existVal = exist(fullfile(pwd,'BehaviorDEPOT_GUI_v1_0')); %#ok<EXIST>
             doesShadowExist = existVal >= 2 && existVal <= 6;
             
             pathOne = java.io.File(pwd);
@@ -71,8 +71,8 @@ classdef BehaviorDEPOT_050App < handle
             pathTwo = pathTwo.getCanonicalPath();
             
             if (doesShadowExist && ~pathOne.equals(pathTwo))
-                % We are trying to execute the wrong BehDep_GUI_current
-                errordlg(message('MATLAB:apps:runapp:WrongEntryPoint', 'BehDep_GUI_current').getString, ...
+                % We are trying to execute the wrong BehaviorDEPOT_GUI_v1_0
+                errordlg(message('MATLAB:apps:runapp:WrongEntryPoint', 'BehaviorDEPOT_GUI_v1_0').getString, ...
                     message('MATLAB:apps:runapp:WrongEntryPointTitle').getString);
                 appinstall.internal.stopapp([],[],obj)
                 return;
@@ -80,10 +80,10 @@ classdef BehaviorDEPOT_050App < handle
             
             % Must load function (force by using function handle) or nargout lies.
             % Check if the app is a GUIDE app
-            if nargout(@BehDep_GUI_current) == 0
-                eval('BehDep_GUI_current');
+            if nargout(@BehaviorDEPOT_GUI_v1_0) == 0
+                eval('BehaviorDEPOT_GUI_v1_0');
             else
-                obj.AppHandle = eval('BehDep_GUI_current');
+                obj.AppHandle = eval('BehaviorDEPOT_GUI_v1_0');
             end
             
             if(ishandle(obj.AppHandle))
@@ -98,7 +98,7 @@ classdef BehaviorDEPOT_050App < handle
             else
                 % There will be no call to stopapp, instead decrease the refcount
                 % now to prevent future clearing issues
-                BehaviorDEPOT_050App.refcount(obj.Increment);
+                BehaviorDEPOTApp.refcount(obj.Increment);
                 munlock;
             end
         end

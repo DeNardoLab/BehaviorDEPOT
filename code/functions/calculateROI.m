@@ -17,11 +17,11 @@ function output = calculateROI(Behavior, Metrics, Params)
                 i_beh_name = string(beh_name(i));  % load behvavior name
                 i_beh_vec = Behavior.(i_beh_name).Vector;   % load behavior vector
                 in_roi_beh = find(in_roi == 1 & i_beh_vec == 1);  % find frames when location is within ROI and behavior occurred
-                roi_beh_vec = zeros(1,length(loc));
+                roi_beh_vec = zeros(1, length(loc));
                 roi_beh_vec(in_roi_beh) = 1;
 
                 out_roi_beh = find(in_roi == 0 & i_beh_vec == 1);  % find frames when location is outside ROI and behavior occurred
-                out_roi_beh_vec = zeros(1,length(loc));
+                out_roi_beh_vec = zeros(1, length(loc));
                 out_roi_beh_vec(out_roi_beh) = 1;
 
                 output.(roi_name).(i_beh_name).inROIbehaviorVector = roi_beh_vec;  % vector of frames when behavior occurred within ROI

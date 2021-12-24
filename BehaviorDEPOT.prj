@@ -1,14 +1,14 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="2629267909" file="C:\BehaviorDEPOT\BehaviorDEPOT.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOT" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="83420990" file="C:\BehaviorDEPOT\BehaviorDEPOT.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOT" target="target.mlapps" target-name="Package App">
     <param.appname>BehaviorDEPOT</param.appname>
     <param.authnamewatermark>C. Gabriel, Z. Zeidler, B. Jin, L. DeNardo</param.authnamewatermark>
     <param.email>cjgabrie@g.ucla.edu</param.email>
     <param.company />
     <param.icon />
     <param.icons />
-    <param.summary>BehaviorDEPOT v1.0 application for analyzing top-down rodent DLC tracking and automatic behavior classification</param.summary>
+    <param.summary>BehaviorDEPOT v1.0 application for analyzing top-down rodent pose tracking and automatic behavior classification</param.summary>
     <param.description />
-    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tp97e14d9a_0b08_4e12_b072_1467be734d14.png</param.screenshot>
+    <param.screenshot />
     <param.version>1.0</param.version>
     <param.products.name>
       <item>MATLAB</item>
@@ -39,17 +39,16 @@
       <param.icon />
       <param.icons />
       <param.description />
+      <param.screenshot />
       <param.version />
       <param.platforms />
     </unset>
     <fileset.main>
       <file>${PROJECT_ROOT}\BehaviorDEPOT_GUI_v1_0.mlapp</file>
     </fileset.main>
-    <fileset.depfun>
-      <file>${PROJECT_ROOT}\code\BehDEPOT_mainscript.m</file>
-      <file>${PROJECT_ROOT}\code\convertHumanAnnotations_BD.m</file>
-    </fileset.depfun>
+    <fileset.depfun />
     <fileset.resources>
+      <file>${PROJECT_ROOT}\code</file>
       <file>${PROJECT_ROOT}\code\classifiers</file>
       <file>${PROJECT_ROOT}\code\functions</file>
       <file>${PROJECT_ROOT}\code\modules</file>

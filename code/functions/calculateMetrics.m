@@ -40,7 +40,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     if isempty(P.part_save)
          dlgTitle    = 'Part list save';
          dlgQuestion = 'Do you wish to use the same part list for all batched analyses?';
-         P.part_save = questdlg(dlgQuestion,dlgTitle,"Yes","No", "Yes");
+         P.part_save = questdlg(dlgQuestion,dlgTitle, "Yes", "No", "Yes");
          
          if P.part_save == "Yes"
              P.part_lookup = part_lookup;
@@ -65,7 +65,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
             tempTracking.(part_list{i}) = [];
         end
     end
-    tempTracking = rmfield(tempTracking,'Other');
+    tempTracking = rmfield(tempTracking, 'Other');
 
     %% METRIC CALCULATIONS
     % When adding new metrics, use tempTracking struct to perform calculates 
@@ -82,7 +82,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
             tempTracking.BetwLegs(2,:) = (tempTracking.Left_Leg(2,:) + tempTracking.Right_Leg(2,:))/2;
     end
 
-    %% Calculate Head position from LeftEar, RightEar, optionally Nose (Head)
+    %% Calculate Head position from LeftEar, RightEar, Nose, or Implant, if appicable
     if isempty(tempTracking.Head)
         if ~isempty(tempTracking.Left_Ear) && ~isempty(tempTracking.Right_Ear) && ~isempty(tempTracking.Nose)
             temp_x = nanmean([tempTracking.Nose(1,:); tempTracking.Left_Ear(1,:); tempTracking.Right_Ear(1,:)]);
@@ -91,6 +91,13 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         else
             tempTracking.Head = tempTracking.BetwEars;
         end
+    end
+    
+    % Calculate Head Position Using Head Implant
+    if ~isempty(tempTracking.Left_Ear) && ~isempty(tempTracking.Right_Ear) && ~isempty(tempTracking.Implant)
+        temp_x = nanmean([tempTracking.Implant(1,:); tempTracking.Left_Ear(1,:); tempTracking.Right_Ear(1,:)]);
+        temp_y = nanmean([tempTracking.Implant(2,:); tempTracking.Left_Ear(2,:); tempTracking.Right_Ear(2,:)]);
+        tempTracking.Head_Implant = [temp_x; temp_y];
     end
     
     %% Calculate MidBack from BetwEars, BetwLegs, and/or Tailbase, if not tracked directly (MidBack)
@@ -102,7 +109,6 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
             tempTracking.MidBack(2,:) = (tempTracking.BetwEars(2,:) + tempTracking.Tailbase(2,:))/2;
     end
         
-        
     %% Calculate BetwShoulders position from LeftEar, RightEar, and MidBack (BetwShoulders)
     if ~isempty(tempTracking.Left_Ear) && ~isempty(tempTracking.Right_Ear) && ~isempty(tempTracking.MidBack)
         temp_x = nanmean([tempTracking.Left_Ear(1,:); tempTracking.Right_Ear(1,:); tempTracking.MidBack(1,:)]);
@@ -111,7 +117,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     end
     
     %% Calculate RearBack position from LeftLeg, RightLeg, and Tailbase (RearBack)
-    if  ~isempty(tempTracking.Left_Leg) && ~isempty(tempTracking.Right_Leg) && ~isempty(tempTracking.Tailbase)
+    if ~isempty(tempTracking.Left_Leg) && ~isempty(tempTracking.Right_Leg) && ~isempty(tempTracking.Tailbase)
         temp_x = nanmean([tempTracking.Left_Leg(1,:); tempTracking.Right_Leg(1,:); tempTracking.Tailbase(1,:)]);
         temp_y = nanmean([tempTracking.Left_Leg(2,:); tempTracking.Right_Leg(2,:); tempTracking.Tailbase(2,:)]);
         tempTracking.RearBack = [temp_x; temp_y];
@@ -167,7 +173,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     
     %% Calculate Angular Information - Angles are relative to the positive x axis (angle 0 = positive x-axis, pi/-pi = negative x-axis)
     % Calculate Angles in Degrees
-    numframes = length(temp_x);
+    numframes = Params.numFrames;
     
     for i = 1:numframes
         try 
@@ -265,7 +271,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
 
     %% Acceleration Calculations
     for i_part = 1:length(fn)
-        Metrics.Acceleration.(fn{i_part}) = diff(Metrics.Velocity.(fn{i_part}));
+        Metrics.Acceleration.(fn{i_part}) = diff(Metrics.Velocity.(fn{i_part})) / Params.Video.frameRate;
         Metrics.Acceleration.(fn{i_part}) = [Metrics.Acceleration.(fn{i_part})(:,1), Metrics.Acceleration.(fn{i_part})]; % to keep length the same
     end
   
@@ -275,7 +281,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     
     if isfield(tempTracking, 'MidBack')
         locat = tempTracking.MidBack;
-    elseif isfield(tempTracking, 'RearBack')
+    elseif isfield(tempTracking, 'BetwEars')
         locat = tempTracking.RearBack;
     elseif isfield(tempTracking, 'BetwLegs')
         locat = tempTracking.BetwLegs;
