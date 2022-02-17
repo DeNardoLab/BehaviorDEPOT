@@ -1,15 +1,15 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="83420990" file="C:\BehaviorDEPOT\BehaviorDEPOT.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOT" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="954531763" file="C:\BehaviorDEPOT\BehaviorDEPOT.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOT" target="target.mlapps" target-name="Package App">
     <param.appname>BehaviorDEPOT</param.appname>
     <param.authnamewatermark>C. Gabriel, Z. Zeidler, B. Jin, L. DeNardo</param.authnamewatermark>
-    <param.email>cjgabrie@g.ucla.edu</param.email>
+    <param.email />
     <param.company />
     <param.icon />
     <param.icons />
-    <param.summary>BehaviorDEPOT v1.0 application for analyzing top-down rodent pose tracking and automatic behavior classification</param.summary>
+    <param.summary>BehaviorDEPOT v1.0 application for analyzing top-down rodent DLC tracking and automatic behavior classification</param.summary>
     <param.description />
-    <param.screenshot />
-    <param.version>1.0</param.version>
+    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tp223a47fc_857e_4ac9_a62f_d3b67005557d.png</param.screenshot>
+    <param.version>1.1</param.version>
     <param.products.name>
       <item>MATLAB</item>
       <item>Curve Fitting Toolbox</item>
@@ -33,26 +33,22 @@
     </param.products.version>
     <param.platforms />
     <param.output>${PROJECT_ROOT}\installation</param.output>
-    <param.guid>786e8f67-a371-44fa-8876-10a81a869d58</param.guid>
+    <param.guid>50fe1519-e226-4c81-a98f-8617840eb40e</param.guid>
     <unset>
+      <param.email />
       <param.company />
       <param.icon />
       <param.icons />
       <param.description />
-      <param.screenshot />
-      <param.version />
       <param.platforms />
     </unset>
     <fileset.main>
-      <file>${PROJECT_ROOT}\BehaviorDEPOT_GUI_v1_0.mlapp</file>
+      <file>${PROJECT_ROOT}\BehaviorDEPOT_GUI_v1_1d.mlapp</file>
     </fileset.main>
     <fileset.depfun />
     <fileset.resources>
       <file>${PROJECT_ROOT}\code</file>
-      <file>${PROJECT_ROOT}\code\classifiers</file>
-      <file>${PROJECT_ROOT}\code\functions</file>
-      <file>${PROJECT_ROOT}\code\modules</file>
-      <file>${PROJECT_ROOT}\code\plotting</file>
+      <file>${PROJECT_ROOT}\resources</file>
     </fileset.resources>
     <fileset.package />
     <build-deliverables>

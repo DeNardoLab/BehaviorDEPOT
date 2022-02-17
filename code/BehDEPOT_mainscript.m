@@ -17,7 +17,7 @@ if P.batchSession == 0
     basedir = pt;
     P.tracking_file = [pt ft];
     P.video_file = [pv fv];
-    P.video_folder_list = P.video_file;
+    P.video_folder_list = string(P.video_file);
     [frame, frame1, frame_idx, P] = videoInterface([pv fv], P);
 
 elseif P.batchSession == 1
@@ -87,6 +87,10 @@ for j = 1:size(P.video_folder_list, 2)
         
         [frame, frame1, frame_idx, P] = videoInterface(full_vid_path, P);
     end
+    
+    %% Draw ROIs included in specific classifiers
+    P = drawClassROIs(P, frame);
+    
     %% Save parameters to Params structure
     Params = makeParamsStruct(P);    
     Params.basedir = basedir;
@@ -111,38 +115,37 @@ for j = 1:size(P.video_folder_list, 2)
     %% Visual verification of point tracking and body part indexing
     Plots.pointValidation = plotPointTracking(Tracking, Params, frame, frame_idx);
     
-    %% METRIC CALCULATION
+    %% Metric Calculations
     [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P);
  
-    %% RUN BEHAVIOR CLASSIFIERS 
+    %% Initialize Behavior Struct
+    Behavior = struct();
+    
+    %% Apply Spatial Filter
+    if Params.do_roi && Params.num_roi > 0
+        [Params, Behavior.Spatial] = calculateUserROI(Metrics, Params);
+    else
+        [Params, ~] = calculateUserROI(Metrics, Params);
+    end
+    
+    %% Apply Temporal Filter
+    if Params.do_events
+        [Behavior.Temporal, Params, P] = calculateUserEvents(Params, P);
+    end
+    
+    %% Run Behavior Classifiers
     classifier_list = P.classifierNames(P.classSelect);
     beh_names = P.behavior_names(P.classSelect);
     class_handles = cellfun(@str2func, classifier_list, 'UniformOutput', false);
-    Behavior = struct();
     
     for i = 1:size(class_handles, 1)
         this_classifier = class_handles{i};
         Behavior.(beh_names{i}) = this_classifier(Params, Tracking, Metrics);
     end
     
-    % Initialize Behavior_Filter
-    Behavior_Filter = struct;  % separate struct to hold filtered behavior
-    
-    %% APPLY SPATIAL FILTER(S)
-    % separate behavior within and outside ROI
-    if Params.do_roi && Params.num_roi > 0
-        Behavior_Filter.Spatial = calculateROI(Behavior, Metrics, Params);
-    end
-    
-    %% APPLY TEMPORAL FILTER
-    % seperate behavior during time-locked events
-    if Params.do_events
-        [Behavior_Filter.Temporal, Params, P] = calculateEvents(Behavior, Params, P);
-    end
-    
-   %% INTERSECT SPATIAL AND TEMPORAL FILTERS
+   %% Intersect Spatial & Temporal Filters
     if Params.do_roi && Params.do_events
-        Behavior_Filter.Intersect = filterIntersect(Behavior, Behavior_Filter, Params);
+        Behavior.Intersect = filterIntersect(Behavior, Params);
     end
         
     %% Save Data
@@ -162,17 +165,17 @@ for j = 1:size(P.video_folder_list, 2)
         saveAnalysis(analyzed_folder_name, Params, Tracking, Metrics, Behavior);
     end
    
-    %% VISUALIZATIONS
-    % Plot Behavior Bouts
+    %% Visualizations
+    % Plot behavior bouts
     if size(fieldnames(Behavior), 1) > 0
     plotBouts(Behavior, analyzed_folder_name);
     
-    % plot trajectory map
+    % Plot trajectory map
     plotTrajectoryMap(Metrics, frame1, Params, Behavior, analyzed_folder_name);
     
     % Prep for next session (if batch)
         if P.batchSession == 1
-            % reset for next batch
+            % Reset for next batch
             clearvars -except j P;
             disp(['Analyzed ' num2str(j) ' of ' num2str(length(P.video_folder_list))])
             close;

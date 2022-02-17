@@ -127,48 +127,48 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     
     % Calculate Nose-Tailbase Distance
     try
-        Metrics.Dist.NoseTailbase = sqrt((tempTracking.Tailbase(1,:)-tempTracking.Nose(1,:)).^2 + (tempTracking.Tailbase(2,:)-tempTracking.Nose(2,:)).^2);
+        Metrics.Dist.NoseTailbase = sqrt((tempTracking.Tailbase(1,:)-tempTracking.Nose(1,:)).^2 + (tempTracking.Tailbase(2,:)-tempTracking.Nose(2,:)).^2) / Params.px2cm;
     end
     % Calculate Head-Tailbase Distance
     try
-        Metrics.Dist.HeadTailbase = sqrt((tempTracking.Tailbase(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.Tailbase(2,:)-tempTracking.Head(2,:)).^2);
+        Metrics.Dist.HeadTailbase = sqrt((tempTracking.Tailbase(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.Tailbase(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
     end
     % Calculate BetwEars-Tailbase Distance
     try
-        Metrics.Dist.BetwEarsTailbase = sqrt((tempTracking.Tailbase(1,:)-tempTracking.BetwEars(1,:)).^2 + (tempTracking.Tailbase(2,:)-tempTracking.BetwEars(2,:)).^2);
+        Metrics.Dist.BetwEarsTailbase = sqrt((tempTracking.Tailbase(1,:)-tempTracking.BetwEars(1,:)).^2 + (tempTracking.Tailbase(2,:)-tempTracking.BetwEars(2,:)).^2) / Params.px2cm;
     end
     %Head-MidBack Distance
     try
-        Metrics.Dist.HeadMidBack = sqrt((tempTracking.MidBack(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.MidBack(2,:)-tempTracking.Head(2,:)).^2);
+        Metrics.Dist.HeadMidBack = sqrt((tempTracking.MidBack(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.MidBack(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
     end
     %Head-RearBack Distance
     try
-        Metrics.Dist.HeadRearBack = sqrt((tempTracking.RearBack(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.RearBack(2,:)-tempTracking.Head(2,:)).^2);
+        Metrics.Dist.HeadRearBack = sqrt((tempTracking.RearBack(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.RearBack(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
     end
     
     % Calculate Head-LeftLeg Distance
     try
-        Metrics.Dist.HeadLeftLeg = sqrt((tempTracking.LeftLeg(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.LeftLeg(2,:)-tempTracking.Head(2,:)).^2);
+        Metrics.Dist.HeadLeftLeg = sqrt((tempTracking.LeftLeg(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.LeftLeg(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
     end
     % Calculate Head-RightLeg Distance
     try
-        Metrics.Dist.HeadRightLeg = sqrt((tempTracking.RightLeg(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.RightLeg(2,:)-tempTracking.Head(2,:)).^2);
+        Metrics.Dist.HeadRightLeg = sqrt((tempTracking.RightLeg(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.RightLeg(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
     end
     % Calculate Nose-LeftLeg Distance
     try
-        Metrics.Dist.NoseLeftLeg = sqrt((tempTracking.LeftLeg(1,:)-tempTracking.Nose(1,:)).^2 + (tempTracking.LeftLeg(2,:)-tempTracking.Nose(2,:)).^2);
+        Metrics.Dist.NoseLeftLeg = sqrt((tempTracking.LeftLeg(1,:)-tempTracking.Nose(1,:)).^2 + (tempTracking.LeftLeg(2,:)-tempTracking.Nose(2,:)).^2) / Params.px2cm;
     end
     %Nose-RightLeg Distance
     try
-        Metrics.Dist.NoseRightLeg = sqrt((tempTracking.RightLeg(1,:)-tempTracking.Nose(1,:)).^2 + (tempTracking.RightLeg(2,:)-tempTracking.Nose(2,:)).^2);
+        Metrics.Dist.NoseRightLeg = sqrt((tempTracking.RightLeg(1,:)-tempTracking.Nose(1,:)).^2 + (tempTracking.RightLeg(2,:)-tempTracking.Nose(2,:)).^2) / Params.px2cm;
     end
     %LeftEar-LeftLeg Distance
     try
-        Metrics.Dist.LeftEarLeftLeg = sqrt((tempTracking.LeftLeg(1,:)-tempTracking.LeftEar(1,:)).^2 + (tempTracking.LeftLeg(2,:)-tempTracking.LeftEar(2,:)).^2);
+        Metrics.Dist.LeftEarLeftLeg = sqrt((tempTracking.LeftLeg(1,:)-tempTracking.LeftEar(1,:)).^2 + (tempTracking.LeftLeg(2,:)-tempTracking.LeftEar(2,:)).^2) / Params.px2cm;
     end
     %RightEar-RightLeg Distance
     try
-        Metrics.Dist.RightEarRightLeg = sqrt((tempTracking.RightLeg(1,:)-tempTracking.RightEar(1,:)).^2 + (tempTracking.RightLeg(2,:)-tempTracking.RightEar(2,:)).^2);
+        Metrics.Dist.RightEarRightLeg = sqrt((tempTracking.RightLeg(1,:)-tempTracking.RightEar(1,:)).^2 + (tempTracking.RightLeg(2,:)-tempTracking.RightEar(2,:)).^2) / Params.px2cm;
     end    
     
     %% Calculate Angular Information - Angles are relative to the positive x axis (angle 0 = positive x-axis, pi/-pi = negative x-axis)
