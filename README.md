@@ -1,6 +1,6 @@
 # BehaviorDEPOT ReadME
 
-- BehaviorDEPOT v1.0 is now live and under initial testing! Please give it a try and let us know of any issues you may encounter.
+- BehaviorDEPOT v1.1 is now live! Please give it a try, and let us know of any issues you may encounter.
 
 - To find out more about BehaviorDEPOT or to cite the software in your own paper, see our pre-print on bioRxiv: https://www.biorxiv.org/content/10.1101/2021.06.20.449150v2
 
@@ -8,33 +8,15 @@
 
 - Sample DeepLabCut networks that have been trained on our data are available for use. These may work on your own data, depending on the individual camera/chamber setup, but these models can serve as starting points for quickly training your own new networks! Find them here: https://drive.google.com/drive/folders/1Fl4PmLz6CWQcqOjfQ1q_60ZCZjI5949-?usp=sharing
 
-**Patch Notes v1.0**
-- Integrate pipeline with custom classifier selection
-- Update GUI design for support modules
-- Update GUI design for analysis module
-- Add readout of classifiers in GUI with interactive selectivity
-- Write function that runs the classifier functions using the info stored in P and the Params, Tracking, and Metrics structs
-- Add additional behavior classifiers
-- Re-work classifier files to use separate 'P_' files to store parameters
-- Write a function that can apply a minDuration threshold to selected Behavior data
-- Edit GUI to allow custom classifier usage
-- Add convertHumanAnnotations functionality to GUI
-- Update convertHumanAnnotations_BD code
-- Update Metrics structure; make more straightforward to add or modify metrics
-- Merge mainscript files
-- Add new metrics to calculateMetrics
-- Clean up metric naming in calculateMetrics
-- Update GUI to set [batch=0 or 1] to replace mainscript_single
-- Reformat rearing classifier
-- Reformat freezing classifier
-- Reformat moving classifier
-- Write function to standardize generation of behavior structures (genBehStruct)
-- Split freezing scripts into separate files (jitter and velocity)
-- Write function to detect start/stop inds (findStartStop)
-- Write function to apply min time threshold to behaviors (applyMinThreshold)
-- Add smoothing options to GUI
-- Add hampel filtering option to GUI
-- Update spatiotemporal filtering options
+**Patch Notes v1.1**
+- Updated mainscript to accomodate custom ROIs in classifiers
+- Added elevated plus maze (EPM) classifier
+- Added open field test (OFT) classifier
+- Added in-GUI button to open classifier folder
+- Adjusted spatial/temporal ROI output structure; collapsed Behavior_Filter into Behavior.Spatial and Behavior.Temporal
+- Minor bug fixes
+- Fixed a bug causing repeat analysis of single file on 'single' mode
+- Updated plotting files
 
 **----------------------------------------------------------------------------------------------------**
 
