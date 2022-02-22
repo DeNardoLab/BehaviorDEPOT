@@ -14,7 +14,7 @@ tailbase_in_floor = inpolygon(tb(1,:),tb(2,:),Params.arena_floor(:,1),Params.are
 rearingInds = (head_out_floor == 1 & tailbase_in_floor == 1);
 
 [rearStart, rearStop] = findStartStop(rearingInds);
-[rearStart, rearStop] = applyMinThreshold(rearStart, rearStop, Params.Rearing.minDuration, Params);
+[rearStart, rearStop] = applyMinThreshold(rearStart, rearStop, Params.Rearing.minDuration, Params.Video.frameRate);
 
 %% Generate Behavior Structure
 Rearing = genBehStruct(rearStart, rearStop, Params.numFrames);

@@ -1,58 +1,39 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="83420990" file="C:\BehaviorDEPOT\BehaviorDEPOT.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOT" target="target.mlapps" target-name="Package App">
-    <param.appname>BehaviorDEPOT</param.appname>
+  <configuration build-checksum="534784837" file="C:\BehaviorDEPOT\BehaviorDEPOT_1.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOT_1" target="target.mlapps" target-name="Package App">
+    <param.appname>BehaviorDEPOT_1</param.appname>
     <param.authnamewatermark>C. Gabriel, Z. Zeidler, B. Jin, L. DeNardo</param.authnamewatermark>
-    <param.email>cjgabrie@g.ucla.edu</param.email>
+    <param.email />
     <param.company />
     <param.icon />
     <param.icons />
-    <param.summary>BehaviorDEPOT v1.0 application for analyzing top-down rodent pose tracking and automatic behavior classification</param.summary>
+    <param.summary>BehaviorDEPOT v1.1 application for analyzing top-down rodent DLC tracking and automatic behavior classification with spatial/temporal filter</param.summary>
     <param.description />
-    <param.screenshot />
-    <param.version>1.0</param.version>
-    <param.products.name>
-      <item>MATLAB</item>
-      <item>Curve Fitting Toolbox</item>
-      <item>Image Processing Toolbox</item>
-      <item>Signal Processing Toolbox</item>
-      <item>Statistics and Machine Learning Toolbox</item>
-    </param.products.name>
-    <param.products.id>
-      <item>1</item>
-      <item>60</item>
-      <item>17</item>
-      <item>8</item>
-      <item>19</item>
-    </param.products.id>
-    <param.products.version>
-      <item>9.8</item>
-      <item>3.5.11</item>
-      <item>11.1</item>
-      <item>8.4</item>
-      <item>11.7</item>
-    </param.products.version>
+    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tpbf9c3d5f_73bb_4a98_b683_501ddcf1af5c.png</param.screenshot>
+    <param.version>1.1</param.version>
+    <param.products.name />
+    <param.products.id />
+    <param.products.version />
     <param.platforms />
     <param.output>${PROJECT_ROOT}\installation</param.output>
-    <param.guid>786e8f67-a371-44fa-8876-10a81a869d58</param.guid>
+    <param.guid>f1ca5221-1376-4562-a252-33f9a9041607</param.guid>
     <unset>
+      <param.email />
       <param.company />
       <param.icon />
       <param.icons />
       <param.description />
-      <param.screenshot />
-      <param.version />
+      <param.products.name />
+      <param.products.id />
+      <param.products.version />
       <param.platforms />
     </unset>
     <fileset.main>
-      <file>${PROJECT_ROOT}\BehaviorDEPOT_GUI_v1_0.mlapp</file>
+      <file>${PROJECT_ROOT}\BehaviorDEPOT_GUI_v1_1.mlapp</file>
     </fileset.main>
     <fileset.depfun />
     <fileset.resources>
       <file>${PROJECT_ROOT}\code</file>
-      <file>${PROJECT_ROOT}\code\classifiers</file>
-      <file>${PROJECT_ROOT}\code\functions</file>
-      <file>${PROJECT_ROOT}\code\modules</file>
-      <file>${PROJECT_ROOT}\code\plotting</file>
+      <file>${PROJECT_ROOT}\resources</file>
     </fileset.resources>
     <fileset.package />
     <build-deliverables>

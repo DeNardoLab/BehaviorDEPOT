@@ -50,6 +50,9 @@ function [frame, frame1, frame_idx, P] = videoInterface(video_name, P)
         end
         
     end
+    
+    
+    
     P.roi_name = roi_name;
     % Draw arena floor 
     P.arena_floor = [];

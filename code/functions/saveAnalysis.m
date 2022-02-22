@@ -5,7 +5,7 @@
 %structures
 %FUNCTION: save structures as MATLAB files
 
-function saveAnalysis(analyzed_folder_name, Params, Tracking, Metrics, Behavior, Behavior_Filter)
+function saveAnalysis(analyzed_folder_name, Params, Tracking, Metrics, Behavior)
     mkdir(analyzed_folder_name);
     cd(analyzed_folder_name)
     save('Tracking.mat', 'Tracking');
@@ -14,10 +14,6 @@ function saveAnalysis(analyzed_folder_name, Params, Tracking, Metrics, Behavior,
     
     if size(fieldnames(Behavior), 1) > 0
         save('Behavior.mat', 'Behavior');
-    end
-
-    if size(fieldnames(Behavior_Filter), 1) > 0
-        save('Behavior_Filter.mat', 'Behavior_Filter');
     end
 
     close all

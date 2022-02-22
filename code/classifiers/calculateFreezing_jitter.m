@@ -69,7 +69,7 @@ function Freezing = calculateFreezing_jitter(Params, Tracking, Metrics)
     [freezeStart, freezeStop] = findStartStop(freezingFrames);
     
     % Apply minimum velocity threshold
-    [freezeStart, freezeStop] = applyMinThreshold(freezeStart, freezeStop, Params.Freezing.minDuration, Params);
+    [freezeStart, freezeStop] = applyMinThreshold(freezeStart, freezeStop, Params.Freezing.minDuration, Params.Video.frameRate);
 
     % Generate Behavior Structure
     Freezing = genBehStruct(freezeStart, freezeStop, Params.numFrames);
