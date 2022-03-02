@@ -1,5 +1,8 @@
 # BehaviorDEPOT ReadME
 
+
+## Documentation is being moved over to the BehaviorDEPOT Wiki page (https://github.com/DeNardoLab/BehaviorDEPOT/wiki). Head there to check out updated documentation!
+
 - BehaviorDEPOT v1.1 is now live! Please give it a try, and let us know of any issues you may encounter.
 
 - To find out more about BehaviorDEPOT or to cite the software in your own paper, see our pre-print on bioRxiv: https://www.biorxiv.org/content/10.1101/2021.06.20.449150v2
