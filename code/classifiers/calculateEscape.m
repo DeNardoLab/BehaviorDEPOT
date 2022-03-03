@@ -64,7 +64,7 @@ function Escape = calculateEscape(Params, Tracking, Metrics)
     end
     
     % Apply minimum duration threshold
-    [escapeStart, escapeStop] = applyMinThreshold(escapeStart, escapeStop, minDuration, Params);
+    [escapeStart, escapeStop] = applyMinThreshold(escapeStart, escapeStop, minDuration, Params.Video.frameRate);
 
     % Generate Behavior Structure
     Escape = genBehStruct(escapeStart, escapeStop, Params.numFrames);

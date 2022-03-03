@@ -19,8 +19,8 @@ function [varargout] = applyMinThreshold(varargin)
         start_inds = varargin{1}(:,1);
         stop_inds = varargin{1}(:,2);
     end
-        minDuration = varargin{-2};
-        frameRate = varargin{-1};
+        minDuration = varargin{nInputs-1};
+        frameRate = varargin{nInputs};
 
     % Adjust minimum duration
     if length(start_inds) > length(stop_inds)

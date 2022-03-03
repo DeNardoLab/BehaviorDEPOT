@@ -47,4 +47,8 @@ for i = 1:length(field_check)
     end   
 end
 
+try
+    all_metrics = rmfield(all_metrics, 'DistanceTravelled_cm');
+end
+
 end

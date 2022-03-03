@@ -1,4 +1,6 @@
-%% plotValidationAvg()
+% plotValidationAvg()
+% C.G. 2/24/22
+% Contact: cjgabrie@ucla.edu
 
 % Generate plots of average output by performance metrics, using VResults
 % structure

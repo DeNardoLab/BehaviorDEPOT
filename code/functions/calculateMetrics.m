@@ -303,10 +303,10 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     dist_frame = sqrt(sum(diff_frame .* diff_frame, 1)); % Pythagorian theorem
     Metrics.Movement.Data = dist_frame * Params.Video.frameRate / Params.px2cm;  % frame by frame movement in cm per sec 
     Metrics.Movement.DataUnits = 'cm per sec';
-    Metrics.Movement.DistanceTraveled = cumsum(dist_frame) / Params.px2cm;  % Cumulative distance traveled per frame
+    Metrics.Movement.DistanceTraveled = [0 cumsum(dist_frame)] / Params.px2cm;  % Cumulative distance traveled per frame
     Metrics.Movement.DistanceUnits = 'cm per frame';
     
-    Tracking.Misc.PreRegistration = Tracking.Smooth;
+    %Tracking.Misc.PreRegistration = Tracking.Smooth;
     Tracking.Smooth = tempTracking;
     
     disp('Tracked point dynamics calculated.')

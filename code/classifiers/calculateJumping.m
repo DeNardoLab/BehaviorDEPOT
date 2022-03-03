@@ -64,7 +64,7 @@ function Jumping = calculateJumping(Params, Tracking, Metrics)
     end
     
     % Apply minimum duration threshold
-    [jumpingStart, jumpingStop] = applyMinThreshold(jumpingStart, jumpingStop, minDuration, Params);
+    [jumpingStart, jumpingStop] = applyMinThreshold(jumpingStart, jumpingStop, minDuration, Params.Video.frameRate);
 
     % Generate Behavior Structure
     Jumping = genBehStruct(jumpingStart, jumpingStop, Params.numFrames);

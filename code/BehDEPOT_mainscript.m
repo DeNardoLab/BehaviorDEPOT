@@ -159,28 +159,27 @@ for j = 1:size(P.video_folder_list, 2)
         analyzed_folder_name = string([P.video_file,'_analyzed']);
     end
     
-    if exist('Behavior_Filter')
-        saveAnalysis(analyzed_folder_name, Params, Tracking, Metrics, Behavior, Behavior_Filter);
-    else
-        saveAnalysis(analyzed_folder_name, Params, Tracking, Metrics, Behavior);
-    end
+    saveAnalysis(analyzed_folder_name, Params, Tracking, Metrics, Behavior);
    
     %% Visualizations
     % Plot behavior bouts
     if size(fieldnames(Behavior), 1) > 0
-    plotBouts(Behavior, analyzed_folder_name);
+        plotBouts(Behavior, analyzed_folder_name);
+    end
     
     % Plot trajectory map
-    plotTrajectoryMap(Metrics, frame1, Params, Behavior, analyzed_folder_name);
-    
-    % Prep for next session (if batch)
-        if P.batchSession == 1
-            % Reset for next batch
-            clearvars -except j P;
-            disp(['Analyzed ' num2str(j) ' of ' num2str(length(P.video_folder_list))])
-            close;
-        end
+    if Params.plotBeh | Params.plotSpace | Params.plotSpaceTime % if plotting behavior, loop through behaviors and make individual figures
+        plotTrajectoryMap(Metrics, frame1, Params, Behavior, analyzed_folder_name);
     end
+    
+    %% Prep for next session (if batch)
+    if P.batchSession == 1
+        % Reset for next batch
+        clearvars -except j P;
+        disp(['Analyzed ' num2str(j) ' of ' num2str(length(P.video_folder_list))])
+        close;
+    end
+        
     disp('Analysis completed. Results stored in data folders.')
     close;
 end

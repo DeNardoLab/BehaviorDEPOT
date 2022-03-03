@@ -14,7 +14,8 @@
     % 5. Behavior from hB to test
     
 % OUTPUTS: 
-    % 1. Unnamed structure containing results
+    % 1. oResults
+    
 function classifier_optimization_module()
 %% Initialization - Set required inputs
 generate_heatmap = 1;

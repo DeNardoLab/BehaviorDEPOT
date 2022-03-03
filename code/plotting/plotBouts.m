@@ -2,6 +2,21 @@ function bouts_plot = plotBouts(Behavior, analyzed_folder_name)
     
     beh_name = fieldnames(Behavior);
     beh_cell = struct2cell(Behavior);
+    beh_check = zeros(size(beh_cell));
+    
+    for i = 1:size(beh_cell, 1)
+       to_check = fieldnames(beh_cell{i});
+       % Check if structs have Bouts and Vector fields, use logic (inds are
+       % mutually exclusive)
+       check_sum = sum(strcmpi(to_check, 'Bouts') | strcmpi(to_check, 'Vector'));
+       if check_sum == 2
+           beh_check(i) = 1;
+       end
+    end
+    
+    beh_name = beh_name(logical(beh_check));
+    beh_cell = beh_cell(logical(beh_check));
+    
     numplots = length(beh_cell);
     framesz = length(beh_cell{1}.Vector);
 
@@ -28,6 +43,7 @@ function bouts_plot = plotBouts(Behavior, analyzed_folder_name)
     bouts_plot = gcf;
     cd(analyzed_folder_name)
     savefig(bouts_plot, 'Behavior Bouts');
+    close;
 
 end
 

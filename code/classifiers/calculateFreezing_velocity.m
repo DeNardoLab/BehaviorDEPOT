@@ -43,7 +43,7 @@ function Freezing = calculateFreezing_velocity(Params, Tracking, Metrics)
     [freezeStart, freezeStop] = findStartStop(freezingFrames);
     
     % Apply minimum velocity threshold
-    [freezeStart, freezeStop] = applyMinThreshold(freezeStart, freezeStop, Params.Freezing.minDuration, Params);
+    [freezeStart, freezeStop] = applyMinThreshold(freezeStart, freezeStop, Params.Freezing.minDuration, Params.Video.frameRate);
 
     % Generate behavior structure
     Freezing = genBehStruct(freezeStart, freezeStop, Params.numFrames);

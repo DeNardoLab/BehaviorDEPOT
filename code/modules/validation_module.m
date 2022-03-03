@@ -1,70 +1,78 @@
 % Validation Module
-% required dir structure:  grandparent \ dir1, dir2, dirN...
-% dirN contains hB file and _analyzed folder with Behavior file,
+% C.G. 2/24/22
+% Contact: cjgabrie@ucla.edu
+
+% SINGLE:
+% Select directory containing 1 BehaviorDEPOT output folder and 1 associated hB file
+
+% BATCH:
+% Required directory (dir) structure:  grandparent \ dir1, dir2, dirN...
+% dirN contains hB file and _analyzed folder with Behavior file
 
 function validation_module()
+
 %% Initialization - Required Inputs
 hB_ID = 'hB*'; %Identifier for human annotation files
 analyzed_ID = '*_analyzed';
-menu('Select directory containing folders with paired hB files (output from convertHumanAnnotations) and BehDEPOT "_analyzed" folders', 'OK')
-pause(2);
+disp('Select directory containing folders with paired hB files (output from convertHumanAnnotations) and BehDEPOT "_analyzed" folders')
 data_directory = uigetdir('','Select directory containing data folders with hB and Behavior files');
 homedir = pwd;
-%%
-%cd(data_directory);
-to_validate = prepBatch(data_directory);
+
+%% Check if single or batch mode based on dir contents
+
+cd(data_directory)
+
+% Search input directory
+BD_search = dir('**/*_analyzed');
+hB_search = dir('**/hB_*');
+
+BD_paths = {BD_search.folder};
+hB_paths = {hB_search.folder};
+
+% Find matching directories
+BD_dirs = unique(BD_paths);
+hB_dirs = unique(hB_paths);
+
+BD_match = zeros(size(BD_dirs));
+
+for i = 1:length(BD_dirs)
+   match_test = strcmpi(BD_dirs(i), hB_dirs);
+   if sum(match_test) == 1
+       BD_match(i) = 1;
+   end
+end
+
+% Initialize counter & file struct
+c = 0;
+to_validate = struct();
+
+% Match up files
+for i = find(BD_match)
+    this_path = BD_dirs(i);
+    BD_ind = strcmp(BD_paths, this_path);
+    hB_ind = strcmp(hB_paths, this_path);
+
+    if sum(BD_ind) == 1 && sum(hB_ind) == 1
+        c = c + 1;
+        to_validate(c).BDfile = BD_search(BD_ind).name;
+        to_validate(c).hBfile = hB_search(hB_ind).name;
+        to_validate(c).path = this_path;
+    end
+end
+
+%% Validation
+%to_validate = prepBatch(data_directory);
 
 for file_num = 1:length(to_validate)
     % cd into correct directory
-    d_folder = to_validate(file_num);
+    d_folder = to_validate(file_num).path{:};
     cd(d_folder)
     
-    % Find data files (Behavior and hB files)
-    comp_search = dir(analyzed_ID);
-    ref_search = dir(hB_ID);
-    
-    if size(ref_search, 1) == 1
-        ref_file = ref_search.name;
-    elseif size(ref_search, 1) == 0
-        disp(['Error: Reference data not found in ' d_folder])
-        return
-    elseif size(ref_search, 1) > 1
-        choose_ref = cell(size(ref_search, 1), 1);
-        for i = 1:size(ref_search, 1)
-            choose_ref{i} = ref_search(i).name;
-        end
-        [select, tf] = listdlg('PromptString','Select reference file to use:',...
-        'SelectionMode','single','ListString',choose_ref);
-        if ~tf
-            disp('Analysis stopped')
-            return
-        end
-        ref_file = choose_ref{select}; 
-        clearvars select tf
-    end
-    
+    ref_file = to_validate(file_num).hBfile;
     load(ref_file);
-    
-    if size(comp_search, 1) == 1
-        comp_dir = comp_search.name;
-    elseif size(comp_search, 1) == 0
-        disp(['Error: BehaviorDEPOT output data not found in ' d_folder])
-        return
-    elseif size(comp_search, 1) > 1
-        choose_comp = cell(size(comp_search, 1), 1);
-        for i = 1:size(comp_search, 1)
-            choose_comp{i} = comp_search(i).name;
-        end
-        [select, tf] = listdlg('PromptString','Select comparison file to use:',...
-        'SelectionMode','single','ListString',choose_comp);
-        if ~tf
-            disp('Analysis stopped')
-            return
-        end
-        comp_dir = choose_comp{select}; 
-        clearvars select tf
-    end
-    
+
+    comp_dir = to_validate(file_num).BDfile;
+
     cd(comp_dir)
     load('Behavior.mat')
     cd('../')
@@ -144,17 +152,23 @@ mkdir(results_folder)
 cd(results_folder)
 
 % Plot and Save Figures
-fig1 = plotValidationPerformance(VResults);
-saveas(fig1, 'PerformanceByVideo.jpg')
-close(fig1)
-
-fig2 = plotValidationAvg(VResults);
-saveas(fig2, 'AvgPerformance.jpg')
-close(fig2)
+if length(to_validate) > 1
+    fig1 = plotValidationPerformance(VResults);
+    saveas(fig1, 'PerformanceByVideo.jpg')
+    close(fig1)
+    
+    fig2 = plotValidationAvg(VResults);
+    saveas(fig2, 'AvgPerformance.jpg')
+    close(fig2) 
+else
+    fig1 = plotValidationSingle(VResults);
+    saveas(fig1, 'Performance.jpg')
+    close(fig1)
+end
 
 results_filename_ext = strcat(behav_to_validate,'_Validation', '.mat');
 save(results_filename_ext, 'VResults')
 cd(data_directory)
 clearvars -except VResults
-msgbox('Validation metrics calculated and saved in data directory');
+disp('Validation metrics calculated and saved in data directory');
 end

@@ -18,7 +18,6 @@ pause(2);
 working_directory = uigetdir('','Select directory containing rater files');
 
 cd(working_directory)
-% all_files = dir2(working_directory);
 analyzed_search = dir(analyzed_ID);
 hB_search = dir(hB_ID);
 hB_names = {};
