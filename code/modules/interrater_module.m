@@ -207,7 +207,7 @@ for b = 1:length(behav_selected)
         ref_data = nanmean(ref_data, 1);
         ref_data = ref_data >= 0.5;
     else
-        ref_data = data(reference_number).Vector';
+        ref_data = data(reference_number).Vector;
         comp_inds(reference_number) = 0;
     end
     
@@ -215,7 +215,7 @@ for b = 1:length(behav_selected)
     comp_data = zeros(length(data), total_frames);
     
     for i = 1:length(data)
-        comp_data(i, :) = data(i).Vector';
+        comp_data(i, :) = data(i).Vector;
     end
     
     %% Calculate TP, TN, FP, FN for each comparison

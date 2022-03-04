@@ -222,8 +222,4 @@ results_filename = 'oResults';
 results_filename_ext = strcat(results_filename, '.mat');
 save(results_filename_ext, 'oResults')
 
-%% TO DO:
-% When using 1 parameter, fix resulting visualizations (p2 overrides)
-% p1--eliminate p1 axis values?
-% Integrate ROC curves
 end

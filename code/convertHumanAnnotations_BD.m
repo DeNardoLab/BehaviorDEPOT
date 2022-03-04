@@ -60,9 +60,9 @@ function convertHumanAnnotations_BD()
                     end
                 end
             end
-        end
         new_csv_table = table(Start, Stop, Behavior);
         human_labels.data = new_csv_table;
+        end
     end
         
     if ~exist('total_frames', 'var')
