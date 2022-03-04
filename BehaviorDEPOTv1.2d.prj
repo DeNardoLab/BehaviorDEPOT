@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="2294429693" file="C:\BehaviorDEPOT\BehaviorDEPOTv1.2d.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOTv1.2d" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="38361500" file="C:\BehaviorDEPOT\BehaviorDEPOTv1.2d.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOTv1.2d" target="target.mlapps" target-name="Package App">
     <param.appname>BehaviorDEPOTv1.2d</param.appname>
     <param.authnamewatermark>C. Gabriel, Z. Zeidler, B. Jin, L. DeNardo</param.authnamewatermark>
     <param.email />
@@ -8,7 +8,7 @@
     <param.icons />
     <param.summary>BehaviorDEPOT v1.2d application for analyzing top-down rodent DLC tracking and automatic behavior classification</param.summary>
     <param.description />
-    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tp886884e7_b5b9_4b71_87c4_d293ede40e76.png</param.screenshot>
+    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tpb0eed27f_21ef_4437_8b2f_4c3ff308c064.png</param.screenshot>
     <param.version>1.2</param.version>
     <param.products.name />
     <param.products.id />

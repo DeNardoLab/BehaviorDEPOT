@@ -21,12 +21,13 @@ cd(working_directory)
 analyzed_search = dir(analyzed_ID);
 hB_search = dir(hB_ID);
 hB_names = {};
-names = {};
+
 for i = 1:size(hB_search,1)
     if ~ispc
         hB_files{i} = [hB_search(i).folder '/' hB_search(i).name];
     else
         hB_files{i} = [hB_search(i).folder '\' hB_search(i).name];
+    end
     prompt = {['Assign name to rater file: ' hB_search(i).name]};  
     dlgtitle = 'Input';
     dims = [1 40];
@@ -168,8 +169,9 @@ for b = 1:length(behav_selected)
     % when accessing error_vector(j,i,:) --> j = reference; i = comparison
     % +1 = false negative; -1 = false positive (relative to reference, j)
     
-%%%%% error_frames = zeros(length(filenames), length(filenames), length(
-    agreement_vector = zeros(length(data(1).Vector), 1);
+    error_vector = zeros(length(data), length(data), length(data(1).Vector));
+
+    agreement_vector = zeros(1, length(data(1).Vector));
 
     for j = 1:length(data)
         for i = 1:length(data)
@@ -184,9 +186,6 @@ for b = 1:length(behav_selected)
     
     %% Compare Percent Overlap between each set of Annotations
 
-    percent_overlap = sum(~abs(error_vector), 3) / total_frames;
-    percent_error = sum(abs(error_vector), 3) / total_frames;
-
     IR_Results.(behav_selected{b}).percent_overlap = sum(~abs(error_vector), 3) / total_frames;
     IR_Results.(behav_selected{b}).percent_error = sum(abs(error_vector), 3) / total_frames;
 
@@ -196,8 +195,6 @@ for b = 1:length(behav_selected)
     IR_Results.(behav_selected{b}).disagreement = disagreement_score;
 
     clearvars disagreement_score agreement_vector percent_overlap percent_error
-    
-    %% Calculate Fleiss's Kappa
     
     %% Select/generate reference data
 
