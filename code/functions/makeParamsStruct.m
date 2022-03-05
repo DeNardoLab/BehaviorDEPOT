@@ -8,6 +8,7 @@ function Params = makeParamsStruct(P)
     Params.roi_name = P.roi_name;
     Params.tracking_fileType = P.tracking_fileType;
     Params.hampel = P.hampel;
+    Params.hampel_span = P.hampel_span;
     Params.cutoffThreshold = P.cutoffThreshold;
     
     %% Smoothing Params

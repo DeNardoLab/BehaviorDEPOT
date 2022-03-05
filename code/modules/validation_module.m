@@ -105,13 +105,13 @@ for file_num = 1:length(to_validate)
     total_frames = length(error_matrix);
     
     % Sort data into TP, TN, FP, FN   
-    TP = zeros(total_frames, 1);
-    TN = zeros(total_frames, 1);
+    TP = zeros(size(ref_data));
+    TN = zeros(size(ref_data));
     
     for ii = 1:total_frames
-        if (error_matrix(ii) == 0) & (ref_data(ii) == 1)
+        if (error_matrix(ii) == 0) && (ref_data(ii) == 1)
             TP(ii) = 1;
-        elseif (error_matrix(ii) == 0) & (ref_data(ii) == 0)
+        elseif (error_matrix(ii) == 0) && (ref_data(ii) == 0)
             TN(ii) = 1;
         end
     end

@@ -47,6 +47,8 @@ dist_traveled_frame = Metrics.Movement.DistanceTraveled;
 
 for i = 1:length(all_ROIs)
     % Calculate percent time in each arm (o1, o2, c1, c2) + center
+    EPM.(roi_names{i}).Bouts = findStartStop(all_ROIs{i});
+    EPM.(roi_name{i}).Vector = all_ROIs{i};
     EPM.(roi_names{i}).TotalTime = sum(all_ROIs{i}) / fps;
     EPM.(roi_names{i}).PercentTime = sum(all_ROIs{i}) / numFrames;
     

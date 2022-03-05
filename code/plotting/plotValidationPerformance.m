@@ -28,6 +28,6 @@ function fig = plotValidationPerformance(VResults)
     ylim([min_data 1])
     xlabel('Video Number')
     title('Specificity')
-    suptitle([VResults.ValidationBehavior ': Performance by Video'])
+    sgtitle([VResults.ValidationBehavior ': Performance by Video'])
 end
 
