@@ -1,22 +1,22 @@
 % Go through spatial and temporal filters to find when both spatial and
 % temporal filters are true. Iterate across all behaviors
 
-function out = filterIntersect(Behavior, Behavior_Filter, Params)
+function out = filterIntersect(Behavior, Params)
             
     
     % gather behaviors 
     beh_name = fieldnames(Behavior);
-    event_names = fieldnames(Behavior_Filter.Temporal);
-    roi_names = fieldnames(Behavior_Filter.Spatial);
+    event_names = fieldnames(Behavior.Temporal);
+    roi_names = fieldnames(Behavior.Spatial);
     beh_cell = struct2cell(Behavior);
     
     for i = 1:length(beh_cell)   % loop through behaviors
-        i_beh_name = string(beh_name(i));  % load behvavior name
+        i_beh_name = string(beh_name(i));  % load behavior name
 
         for j = 1:Params.num_roi % loop through ROIs
             
-            roi_vec = Behavior_Filter.Spatial.(roi_names{j}).inROIvector;        
-            roi_beh_vec = Behavior_Filter.Spatial.(roi_names{j}).(i_beh_name).inROIbehaviorVector;
+            roi_vec = Behavior.Spatial.(roi_names{j}).inROIvector;        
+            roi_beh_vec = Behavior.Spatial.(roi_names{j}).(i_beh_name).inROIbehaviorVector;
 
             for k = 1:Params.num_events  % loop through events
                 event_beh_vec = Behavior_Filter.Temporal.(event_names{k}).(i_beh_name).BehInEventVector';   % find when ROI, event, and behavior == true

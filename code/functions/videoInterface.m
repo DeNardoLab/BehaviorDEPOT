@@ -48,20 +48,8 @@ function [frame, frame1, frame_idx, P] = videoInterface(video_name, P)
             name = cleanText(name);  % removes non alphanumeric chars
             roi_name{r} = char(name);
         end
-        
     end
-    
-    
     
     P.roi_name = roi_name;
-    % Draw arena floor 
-    P.arena_floor = [];
-    if P.do_wallrearing_classifier
-        figure;
-        imshow(frame);
-        title('Select arena floor');
-        roi = drawpolygon;
-        P.arena_floor = roi.Position;
-        close;
-    end
+
 end

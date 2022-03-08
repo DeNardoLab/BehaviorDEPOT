@@ -30,6 +30,11 @@ peri = arena - center;
 all_ROIs = {center, peri, arena};
 roi_names = {'Center', 'Peri', 'Arena'};
 
+% Convolve raw in-ROI vectors
+for i = 1:length(all_ROIs)
+    all_ROIs{i} = convolveFrames(all_ROIs{i}, Params.OFT.windowWidth, Params.OFT.countThreshold);
+end
+
 %% Analysis
 
 dist_traveled_frame = Metrics.Movement.DistanceTraveled;

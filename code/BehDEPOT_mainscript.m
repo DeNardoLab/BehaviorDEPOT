@@ -143,10 +143,10 @@ for j = 1:size(P.video_folder_list, 2)
         Behavior.(beh_names{i}) = this_classifier(Params, Tracking, Metrics);
     end
     
-   %% Intersect Spatial & Temporal Filters
-    if Params.do_roi && Params.do_events
-        Behavior.Intersect = filterIntersect(Behavior, Params);
-    end
+%  %% Intersect Spatial & Temporal Filters
+%     if Params.do_roi && Params.do_events
+%         Behavior.Intersect = filterIntersect(Behavior, Params);
+%     end
         
     %% Save Data
     if P.batchSession == 1

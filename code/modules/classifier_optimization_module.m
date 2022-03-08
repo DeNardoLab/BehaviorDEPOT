@@ -143,7 +143,7 @@ for p1 = 1:length(thresh1_values)
         testParams.(behavior_to_test).(thresh2{1}) = thresh2_values(p2); 
         testBehavior = class_fn(testParams, Tracking, Metrics);
         cmp = testBehavior.Vector;
-        if size(cmp, 2) > size(cmp, 1)
+        if size(cmp, 2) < size(cmp, 1)
             cmp = cmp';
         end
         error = ref - cmp;
