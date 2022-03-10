@@ -106,7 +106,7 @@ for i = 1:length(files)
     structtmp = load(char(files(i)));
     sn = string(fieldnames(structtmp));
     rater_data(i).Behavior = structtmp.(sn);
-    clearvars struct sn
+    clearvars structtmp sn
 end
 
 %% Determine Behaviors to Compare
