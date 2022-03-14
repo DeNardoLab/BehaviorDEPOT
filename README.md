@@ -3,13 +3,30 @@
 
 ## Documentation is being moved over to the BehaviorDEPOT Wiki page (https://github.com/DeNardoLab/BehaviorDEPOT/wiki). Head there to check out updated documentation!
 
-- BehaviorDEPOT v1.1 is now live! Please give it a try, and let us know of any issues you may encounter.
+- BehaviorDEPOT v1.2 is now live! Please give it a try, and let us know of any issues you may encounter.
 
 - To find out more about BehaviorDEPOT or to cite the software in your own paper, see our pre-print on bioRxiv: https://www.biorxiv.org/content/10.1101/2021.06.20.449150v2
 
 - Demo data is now available that can be used to test installation, classifiers, spatial/temporal filtering, and modules. Due to limitations on file size, the original video file (necessary to run the analysis module from scratch) is not available on Github but can be downloaded from: https://drive.google.com/drive/folders/1VNv9FuXyiI4xgt-RokcVvWk-1dBovuqO?usp=sharing
 
 - Sample DeepLabCut networks that have been trained on our data are available for use. These may work on your own data, depending on the individual camera/chamber setup, but these models can serve as starting points for quickly training your own new networks! Find them here: https://drive.google.com/drive/folders/1Fl4PmLz6CWQcqOjfQ1q_60ZCZjI5949-?usp=sharing
+
+**Patch Notes v1.2**
+- Add support for automatic annotation registration if a Nx3 matrix is detected  (convertHumanAnnotations_BD)
+- Add support for single session validation in the Validation Module
+- Revise Validation Module to automatically search and match files based on directory
+- Add plotValidationSingle() for single validation sessions
+- Adjust display order for IR performance plots
+- Add support for Data Exploration - ‘Broad’ Exploration Mode
+- Revise O.G. Data Exploration into ‘Focused’ Exploration Mode
+- Adjust opacity on spatiotemporal plots
+- Fix bug when spatiotemporal plotting without behaviors
+- Update hampel correction to allow adjustable span
+- Add minDuration parameter to calculateEscape
+- Move template classifiers to main Github page.
+- Add TMaze classifier
+- Update spatial classifiers to include bout and vector saving
+- Add 3 Chamber classifier
 
 **Patch Notes v1.1**
 - Updated mainscript to accomodate custom ROIs in classifiers
