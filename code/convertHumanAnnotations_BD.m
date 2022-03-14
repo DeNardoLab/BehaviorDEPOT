@@ -1,4 +1,12 @@
+% convertHumanAnnotations_BD
+% C.G. 2/24/22
+% Contact: cjgabrie@ucla.edu
+
 % INPUTS:
+
+% NO EXPLICIT INPUTS ARE REQUIRED USING THIS FUNCTION, CALL FUNCTION TO PROMPT
+% INPUT
+
 % 1) table_filename: str/char pointing to MATLAB table file -- 1st Column: StartFrame, 2nd
 % Column: StopFrame, 3rd Column (Title = Behavior): Behavior Label
 
@@ -15,9 +23,7 @@
 
 function convertHumanAnnotations_BD()
     
-    if ~ispc
-        menu('Select .mat or .csv file with annotations to convert', 'OK')
-    end
+    disp('Select .mat or .csv file with annotations to convert')
     
     [data_filename, data_path] = uigetfile({'*.mat'; '*.csv'}, 'Select .mat or .csv file with annotations to convert');
     total_frames = input('Type total number of frames in video');
@@ -32,30 +38,34 @@ function convertHumanAnnotations_BD()
         human_labels = load([data_path, data_filename]);
     elseif strcmpi(type, '.csv')
         T = readtable([data_path, data_filename]);
-        table_vars = T.Properties.VariableNames;
-        all_ptrns = {'Start', 'Stop', 'End', 'Behavior'};
         
-        for i = 1:size(all_ptrns, 2)
-            ptrn = all_ptrns{i};
-            var_search = contains(table_vars, ptrn, 'IgnoreCase', true);
-            if sum(var_search) == 1
-                var_ind = find(var_search);
-                
-                if i == 1
-                    Start = table2array(T(:, var_ind));
-                elseif i == 2 || i == 3
-                    Stop = table2array(T(:, var_ind));
-                elseif i == 4
-                    Behavior = categorical(table2array(T(:, var_ind)));
+        if size(T, 2) == 3
+            human_labels.data = T;
+        else
+            table_vars = T.Properties.VariableNames;
+            all_ptrns = {'Start', 'Stop', 'End', 'Behavior'};
+
+            for i = 1:size(all_ptrns, 2)
+                ptrn = all_ptrns{i};
+                var_search = contains(table_vars, ptrn, 'IgnoreCase', true);
+                if sum(var_search) == 1
+                    var_ind = find(var_search);
+
+                    if i == 1
+                        Start = table2array(T(:, var_ind));
+                    elseif i == 2 || i == 3
+                        Stop = table2array(T(:, var_ind));
+                    elseif i == 4
+                        Behavior = categorical(table2array(T(:, var_ind)));
+                    end
                 end
             end
-        end
-        
         new_csv_table = table(Start, Stop, Behavior);
         human_labels.data = new_csv_table;
+        end
     end
         
-    if ~exist('total_frames')
+    if ~exist('total_frames', 'var')
         % Grab information from video file
         vid_dir = dir('*.avi');
     
@@ -82,13 +92,13 @@ function convertHumanAnnotations_BD()
         hBehavior.TotalFrames = total_frames;
     end
 
-    %% Import Video data as human_labels
+    %% Collect data from human_labels
     struct_name = string(fieldnames(human_labels));
     data_table = human_labels.(struct_name);
     
     %% Initialize Structures Using User Behavior Labels
 
-    behav_inds = cellstr(data_table.Behavior);
+    behav_inds = cellstr(table2array(data_table(:,3)));
     
     for i = 1:length(behav_inds)
         behav_inds{i} = strrep(behav_inds{i},' ','');

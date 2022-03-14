@@ -30,12 +30,19 @@ peri = arena - center;
 all_ROIs = {center, peri, arena};
 roi_names = {'Center', 'Peri', 'Arena'};
 
+% Convolve raw in-ROI vectors
+for i = 1:length(all_ROIs)
+    all_ROIs{i} = convolveFrames(all_ROIs{i}, Params.OFT.windowWidth, Params.OFT.countThreshold);
+end
+
 %% Analysis
 
 dist_traveled_frame = Metrics.Movement.DistanceTraveled;
 
 for i = 1:length(all_ROIs)
-    % Calculate percent time in each arm (o1, o2, c1, c2) + center
+    % Calculate percent time in arena, perimeter, center
+    OFT.(roi_names{i}).Bouts = findStartStop(all_ROIs{i});
+    OFT.(roi_names{i}).Vector = all_ROIs{i};
     OFT.(roi_names{i}).TotalTime = sum(all_ROIs{i}) / fps;
     OFT.(roi_names{i}).PercentTime = sum(all_ROIs{i})/numFrames;
     

@@ -200,8 +200,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         ang1 = Metrics.degHeadAngle(1:end-1);
         Metrics.Diff.HeadAngle = mod(ang2 - ang1 + 180, 360) - 180; % use modulo for negative angle crossovers
         Metrics.Diff.HeadAngle = [Metrics.Diff.HeadAngle(1), Metrics.Diff.HeadAngle]; %keep same length
-        Metrics.Diff.HeadAngle = Metrics.Diff.HeadAngle * Params.Video.frameRate;  % convert from deg/frame to deg/sec
-        Metrics.Velocity.HeadAngle = Metrics.Diff.HeadAngle;
+        Metrics.Velocity.HeadAngle = Metrics.Diff.HeadAngle * Params.Video.frameRate;  % convert from deg/frame to deg/sec
     end
     
     % Full Body Angle
@@ -210,8 +209,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         ang1 = Metrics.degFullBodyAngle(1:end-1);
         Metrics.Diff.FullBodyAngle = mod(ang2 - ang1 + 180, 360) - 180; % use modulo for negative angle crossovers
         Metrics.Diff.FullBodyAngle = [Metrics.Diff.FullBodyAngle(1), Metrics.Diff.FullBodyAngle];
-        Metrics.Diff.FullBodyAngle = Metrics.Diff.FullBodyAngle * Params.Video.frameRate;
-        Metrics.Velocity.FullBodyAngle = Metrics.Diff.FullBodyAngle;
+        Metrics.Velocity.FullBodyAngle = Metrics.Diff.FullBodyAngle * Params.Video.frameRate;
     end
     
     % Front Body Angle
@@ -220,8 +218,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         ang1 = Metrics.degFrontBodyAngle(1:end-1);
         Metrics.Diff.FrontBodyAngle = mod(ang2 - ang1 + 180, 360) - 180; % use modulo for negative angle crossovers
         Metrics.Diff.FrontBodyAngle = [Metrics.Diff.FrontBodyAngle(1), Metrics.Diff.FrontBodyAngle];
-        Metrics.Diff.FrontBodyAngle = Metrics.Diff.FrontBodyAngle * Params.Video.frameRate;
-        Metrics.Velocity.FrontBodyAngle = Metrics.Diff.FrontBodyAngle;
+        Metrics.Velocity.FrontBodyAngle = Metrics.Diff.FrontBodyAngle * Params.Video.frameRate;
     end
     
     % Rear Body Angle
@@ -230,8 +227,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         ang1 = Metrics.degRearBodyAngle(1:end-1);
         Metrics.Diff.RearBodyAngle = mod(ang2 - ang1 + 180, 360) - 180; % use modulo for negative angle crossovers
         Metrics.Diff.RearBodyAngle = [Metrics.Diff.RearBodyAngle(1), Metrics.Diff.RearBodyAngle];
-        Metrics.Diff.RearBodyAngle = Metrics.Diff.RearBodyAngle * Params.Video.frameRate;
-        Metrics.Velocity.RearBodyAngle = Metrics.Diff.RearBodyAngle;
+        Metrics.Velocity.RearBodyAngle = Metrics.Diff.RearBodyAngle * Params.Video.frameRate;
     end
     
     % Tail Angle
@@ -240,8 +236,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         ang1 = Metrics.degTailAngle(1:end-1);
         Metrics.Diff.TailAngle = mod(ang2 - ang1 + 180, 360) - 180; % use modulo for negative angle crossovers
         Metrics.Diff.TailAngle = [Metrics.Diff.TailAngle(1), Metrics.Diff.TailAngle];
-        Metrics.Diff.TailAngle = Metrics.Diff.TailAngle * Params.Video.frameRate;
-        Metrics.Velocity.TailAngle = Metrics.Diff.TailAngle;
+        Metrics.Velocity.TailAngle = Metrics.Diff.TailAngle * Params.Video.frameRate;
     end
     
     %% Calculate body part differentials
@@ -258,7 +253,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     % iterate through each tracked part
     for i_part = 1:length(fn)
         Metrics.Diff.(fn{i_part}) = [diff(tempTracking.(fn{i_part})(1,:)); diff(tempTracking.(fn{i_part})(2,:))];
-        Metrics.Diff.(fn{i_part}) = Metrics.Diff.(fn{i_part}) * (Params.Video.frameRate / Params.px2cm); % convert from px/frame to  cm/sec
+        Metrics.Diff.(fn{i_part}) = Metrics.Diff.(fn{i_part}) * (Params.Video.frameRate / Params.px2cm); % convert from px/frame to cm/sec
         Metrics.Diff.(fn{i_part}) = [Metrics.Diff.(fn{i_part})(:,1), Metrics.Diff.(fn{i_part})]; % to keep length the same
     end
         
@@ -306,7 +301,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     Metrics.Movement.DistanceTraveled = [0 cumsum(dist_frame)] / Params.px2cm;  % Cumulative distance traveled per frame
     Metrics.Movement.DistanceUnits = 'cm per frame';
     
-    Tracking.Misc.PreRegistration = Tracking.Smooth;
+    %Tracking.Misc.PreRegistration = Tracking.Smooth;
     Tracking.Smooth = tempTracking;
     
     disp('Tracked point dynamics calculated.')

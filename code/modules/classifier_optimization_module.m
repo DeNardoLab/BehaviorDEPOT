@@ -14,7 +14,8 @@
     % 5. Behavior from hB to test
     
 % OUTPUTS: 
-    % 1. Unnamed structure containing results
+    % 1. oResults
+    
 function classifier_optimization_module()
 %% Initialization - Set required inputs
 generate_heatmap = 1;
@@ -142,7 +143,7 @@ for p1 = 1:length(thresh1_values)
         testParams.(behavior_to_test).(thresh2{1}) = thresh2_values(p2); 
         testBehavior = class_fn(testParams, Tracking, Metrics);
         cmp = testBehavior.Vector;
-        if size(cmp, 2) > size(cmp, 1)
+        if size(cmp, 2) < size(cmp, 1)
             cmp = cmp';
         end
         error = ref - cmp;
@@ -221,8 +222,4 @@ results_filename = 'oResults';
 results_filename_ext = strcat(results_filename, '.mat');
 save(results_filename_ext, 'oResults')
 
-%% TO DO:
-% When using 1 parameter, fix resulting visualizations (p2 overrides)
-% p1--eliminate p1 axis values?
-% Integrate ROC curves
 end

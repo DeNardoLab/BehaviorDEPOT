@@ -143,10 +143,10 @@ for j = 1:size(P.video_folder_list, 2)
         Behavior.(beh_names{i}) = this_classifier(Params, Tracking, Metrics);
     end
     
-   %% Intersect Spatial & Temporal Filters
-    if Params.do_roi && Params.do_events
-        Behavior.Intersect = filterIntersect(Behavior, Params);
-    end
+%  %% Intersect Spatial & Temporal Filters
+%     if Params.do_roi && Params.do_events
+%         Behavior.Intersect = filterIntersect(Behavior, Params);
+%     end
         
     %% Save Data
     if P.batchSession == 1
@@ -168,11 +168,11 @@ for j = 1:size(P.video_folder_list, 2)
     end
     
     % Plot trajectory map
-    if Params.plotBeh  % if plotting behavior, loop through behaviors and make individual figures
+    if Params.plotBeh | Params.plotSpace | Params.plotSpaceTime % if plotting behavior, loop through behaviors and make individual figures
         plotTrajectoryMap(Metrics, frame1, Params, Behavior, analyzed_folder_name);
     end
     
-    % Prep for next session (if batch)
+    %% Prep for next session (if batch)
     if P.batchSession == 1
         % Reset for next batch
         clearvars -except j P;

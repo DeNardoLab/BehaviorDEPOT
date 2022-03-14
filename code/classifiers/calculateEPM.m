@@ -41,12 +41,18 @@ all_closed = closed1 | closed2;
 all_ROIs = {all_open, all_closed, center, open1, open2, closed1, closed2};
 roi_names = {'Open', 'Closed', 'Center', 'O1', 'O2', 'C1', 'C2'};
 
-%% Analysis
+% Convolve raw in-ROI vectors
+for i = 1:length(all_ROIs)
+    all_ROIs{i} = convolveFrames(all_ROIs{i}, Params.EPM.windowWidth, Params.EPM.countThreshold);
+end
 
+%% Analysis
 dist_traveled_frame = Metrics.Movement.DistanceTraveled;
 
 for i = 1:length(all_ROIs)
     % Calculate percent time in each arm (o1, o2, c1, c2) + center
+    EPM.(roi_names{i}).Bouts = findStartStop(all_ROIs{i});
+    EPM.(roi_names{i}).Vector = all_ROIs{i};
     EPM.(roi_names{i}).TotalTime = sum(all_ROIs{i}) / fps;
     EPM.(roi_names{i}).PercentTime = sum(all_ROIs{i}) / numFrames;
     

@@ -12,13 +12,14 @@ function Tracking = genTracking_custom(data, Params)
     
     cutoffThreshold = Params.cutoffThreshold;
     hmpl = Params.hampel;
+    hmpl_span = Params.hampel_span;
     % Convert data to Tracking structure and apply hampel correction
     part_names = Params.part_names;
     for i = 1:length(part_names)
         this_part = part_names{i};
         Tracking.Raw.(this_part) = data(i*3-1:i*3+1,:);
         if hmpl
-            Tracking.Raw.(this_part) = hampel(Tracking.Raw.(this_part));
+            Tracking.Raw.(this_part) = hampel(Tracking.Raw.(this_part), hmpl_span);
         end
         
         % toss data below likelihood threshold

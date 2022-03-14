@@ -1,22 +1,22 @@
-function Rearing = calculateRearing(Params, Tracking, Metrics)
-try 
-    loc = Tracking.Smooth.Head;
-    % find frames when head location is outside floor boundaries
-    head_out_floor = ~inpolygon(loc(1,:),loc(2,:),Params.arena_floor(:,1),Params.arena_floor(:,2));  
+function Rearing = calculateRearing(Params, ~, ~)
 
-    % find frames when tailbase is within floor boundaries
-    tb = Tracking.Smooth.Tailbase;
-catch
-    error('Rearing classifier requires Head (or Ears and Nose) and Tailbase to be tracked');
-end
+% Set total frames
+numFrames = Params.numFrames;
+fps = Params.Video.frameRate;
 
-tailbase_in_floor = inpolygon(tb(1,:),tb(2,:),Params.arena_floor(:,1),Params.arena_floor(:,2));  
-rearingInds = (head_out_floor == 1 & tailbase_in_floor == 1);
+% Set arena_floor ROI
+in_arena = Params.Rearing.Arena_Floor.inROIvector;
 
-[rearStart, rearStop] = findStartStop(rearingInds);
-[rearStart, rearStop] = applyMinThreshold(rearStart, rearStop, Params.Rearing.minDuration, Params.Video.frameRate);
+% Convolve raw in-ROI vectors
+in_arena = convolveFrames(in_arena, Params.Rearing.windowWidth, Params.Rearing.countThreshold);
+
+% Find rearingInds
+rearing_vector = ~in_arena;
+
+[rearStart, rearStop] = findStartStop(rearing_vector);
+[rearStart, rearStop] = applyMinThreshold(rearStart, rearStop, Params.Rearing.minDuration, fps);
 
 %% Generate Behavior Structure
-Rearing = genBehStruct(rearStart, rearStop, Params.numFrames);
+Rearing = genBehStruct(rearStart, rearStop, numFrames);
 
 end

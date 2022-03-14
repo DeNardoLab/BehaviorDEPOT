@@ -23,96 +23,86 @@ end
 beh_name = beh_name(logical(beh_check));
 beh_cell = beh_cell(logical(beh_check));
 
-for i = 1:length(beh_cell)   % loop through behaviors
-    close;
+
+if Params.plotBeh
+    for i = 1:length(beh_cell)   % loop through behaviors
+        figure;
+        I = imshow(frame1);
+        set(I, 'AlphaData', 0.4)  % set to 0 if don't want arena image superimposed
+        hold on
+        title('Behavior Mapping');
+        lgnd = [];
+    
+        if Params.plotSpaceTime
+            lgnd = [lgnd, 'location'];
+            sz = 1:length(X);
+            scatter(X, Y, 5, sz, 'filled');
+            colormap('jet');
+            colorbar;
+            colorbar('Ticks',[100,(length(X)-100)],'TickLabels',{'Start','End'}) 
+        elseif Params.plotSpace
+            lgnd = [lgnd, 'trajectory'];
+            scatter(X, Y, 5, 'filled');
+        end        
+    
+        i_beh_name = string(beh_name(i));  % load behavior name
+        i_beh_vec = beh_cell{i}.Vector;   % load behavior vector
+        i_beh_loc = Metrics.Location(:,~~i_beh_vec);
+        scatter(i_beh_loc(1,:),i_beh_loc(2,:),beh_icons{i});
+        lgnd = [lgnd, i_beh_name];
+    
+        if Params.do_roi
+            for i = 1:length(Params.roi)
+               plot(polyshape(Params.roi{i}), 'FaceAlpha', 0.1);
+               lgnd = [lgnd, strcat('ROI #',string(i))];
+            end
+        end
+    
+        legend(lgnd);
+        beh_plot = gcf;   
+        cd(analyzed_folder_name)
+        savename = strcat(i_beh_name, ' Map');
+        savefig(beh_plot, (savename));
+        close;
+    end
+else
     figure;
     I = imshow(frame1);
-    set(I, 'AlphaData', 0.2)  % set to 0 if don't want arena image superimposed
+    set(I, 'AlphaData', 0.5)  % set to 0 if don't want arena image superimposed
     hold on
-    title('Behavior Mapping');
-    leg = [];
+    title('Trajectory Mapping');
 
     if Params.plotSpaceTime
-        leg = [leg, 'location'];
+        % Plot spatiotemporal trajectory without behavior
+        lgnd = ['location'];
         sz = 1:length(X);
         scatter(X, Y, 5, sz, 'filled');
         colormap('jet');
         colorbar;
-        colorbar('Ticks',[100,(length(X)-100)],'TickLabels',{'Start','End'}) 
-    elseif Params.plotSpace
-        leg = [leg, 'trajectory'];
+        colorbar('Ticks',[100,(length(X)-100)],'TickLabels',{'Start','End'})
+        savename = strcat('Spatiotemporal Trajectory Map');
+    else
+        % Plot spatial trajectory
+        lgnd = ['trajectory'];
         scatter(X, Y, 5, 'filled');
-    end        
-
-    i_beh_name = string(beh_name(i));  % load behavior name
-    i_beh_vec = beh_cell{i}.Vector;   % load behavior vector
-    i_beh_loc = Metrics.Location(:,~~i_beh_vec);
-    scatter(i_beh_loc(1,:),i_beh_loc(2,:),beh_icons{i});
-    leg = [leg, i_beh_name];
+        savename = strcat('Spatial Trajectory Map');
+    end   
 
     if Params.do_roi
         for i = 1:length(Params.roi)
            plot(polyshape(Params.roi{i}), 'FaceAlpha', 0.1);
-           leg = [leg, strcat('ROI #',string(i))];
+           lgnd = [lgnd, strcat('ROI #',string(i))];
         end
     end
 
-    legend(leg);
-    beh_plot = gcf;   
+    legend(lgnd);
+    sptm_plot = gcf;
     cd(analyzed_folder_name)
-    savename = strcat(i_beh_name, ' Map');
-    savefig(beh_plot, (savename));
+
+    savefig(sptm_plot, (savename));
 end
 
-if Params.plotSpaceTime
-    figure;
-    I = imshow(frame1);
-    set(I, 'AlphaData', 0.2)  % set to 0 if don't want arena image superimposed
-    hold on
-    title('Behavior Mapping');
-    leg = [];
-
-    leg = [leg, 'location'];
-    sz = 1:length(X);
-    scatter(X, Y, 5, sz, 'filled');
-    colormap('jet');
-    colorbar;
-    colorbar('Ticks',[100,(length(X)-100)],'TickLabels',{'Start','End'}) 
-    if Params.do_roi
-        for i = 1:length(Params.roi)
-           plot(polyshape(Params.roi{i}), 'FaceAlpha', 0.1);
-           leg = [leg, strcat('ROI #',string(i))];
-        end
-    end
-
-    legend({leg});
-    beh_plot = gcf;   
-    cd(analyzed_folder_name)
-    savename = 'Behavior Map';
-    savefig(beh_plot, (savename));
-elseif Params.plotSpace
-    figure;
-    I = imshow(frame1);
-    set(I, 'AlphaData', 0.2)  % set to 0 if don't want arena image superimposed
-    hold on
-    title('Behavior Mapping');
-    leg = [];
-    leg = [leg, 'trajectory'];
-    scatter(X, Y, 5, 'filled');
-   if Params.do_roi
-        for i = 1:length(Params.roi)
-           plot(polyshape(Params.roi{i}), 'FaceAlpha', 0.1);
-           leg = [leg, strcat('ROI #',string(i))];
-        end
-   end
-
-   legend(leg);
-   beh_plot = gcf;   
-   cd(analyzed_folder_name)
-   savename = 'Behavior Map';
-   savefig(beh_plot, (savename));
-   close;
 end
-end
+
 
 
