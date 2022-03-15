@@ -1,7 +1,8 @@
 # BehaviorDEPOT ReadME
 
-
 ## Documentation is being moved over to the BehaviorDEPOT Wiki page (https://github.com/DeNardoLab/BehaviorDEPOT/wiki). Head there to check out updated documentation!
+
+![bd_v1 2_gui_image](https://user-images.githubusercontent.com/25350601/158289893-9f471a44-ba23-4991-8e49-9b60805cded9.png)
 
 - BehaviorDEPOT v1.2 is now live! Please give it a try, and let us know of any issues you may encounter.
 
