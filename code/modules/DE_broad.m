@@ -73,8 +73,7 @@ coef = coef_table.Estimate;
 ranked_list = [metric_labels(old_inds)];
 
 %% Save GLM Equation & Relevant Data
-save_path = Params.basedir;
-cd(save_path)
+cd ..
 mkdir('DE_Results')
 cd('DE_Results')
 mkdir('Broad')

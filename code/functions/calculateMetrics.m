@@ -68,7 +68,8 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     tempTracking = rmfield(tempTracking, 'Other');
 
     %% METRIC CALCULATIONS
-    % When adding new metrics, use tempTracking struct to perform calculates 
+    % When adding new metrics, use tempTracking struct to perform
+    % calculations
     
     %% Calculate point between ears (BetwEars)
     if ~isempty(tempTracking.Left_Ear) && ~isempty(tempTracking.Right_Ear)

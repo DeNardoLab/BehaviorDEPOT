@@ -56,7 +56,7 @@ for f = 1:numfiles
     end
 
     % convert event times to vector
-    output = genBehStruct(eventmat(:,1), eventmat(:,2), numFrames);
+    output.(eventname) = genBehStruct(eventmat(:,1), eventmat(:,2), numFrames);
 
 end
 end

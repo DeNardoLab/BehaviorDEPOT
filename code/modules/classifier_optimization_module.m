@@ -45,15 +45,6 @@ class_path = [app_path, 'classifiers'];
 full_hB_path = [hB_path, hB_file];
 load(full_hB_path);
 
-% Search hB_filepath for hB file
-% cd(hB_filepath)
-% hB_search = dir('hB*');
-% if size(hB_search, 1) == 1
-%     load(hB_search.name)
-% else
-%     disp('No hB files found (or multiple contained in one directory')
-% end
-
 % Scan hBehavior contents for behaviors (i.e. structures)
 hB_fields = fieldnames(hBehavior);
 
@@ -173,8 +164,6 @@ for p1 = 1:length(thresh1_values)
 end
 
 %% Prep Save Folder
-save_path = Params.basedir;
-cd(save_path)
 mkdir('Optimization_Results')
 cd('Optimization_Results')
 

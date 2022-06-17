@@ -101,7 +101,7 @@ for j = 1:size(P.video_folder_list, 2)
     end
     
     %% CSV/H5 Registration
-    [data, Params] = importDLCTracking(Params);
+    [data, Params] = importTracking(Params);
     Params.numFrames = size(data, 2);
      
     %% Convert data to Tracking structure and apply hampel correction

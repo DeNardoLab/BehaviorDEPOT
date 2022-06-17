@@ -5,7 +5,7 @@
 % INPUTS:
 
 % NO EXPLICIT INPUTS ARE REQUIRED USING THIS FUNCTION, CALL FUNCTION TO PROMPT
-% INPUT
+% INPUT -- SELECT ANNOTATION TABLE FILE, THEN INPUT TOTAL NUMBER OF FRAMES
 
 % 1) table_filename: str/char pointing to MATLAB table file -- 1st Column: StartFrame, 2nd
 % Column: StopFrame, 3rd Column (Title = Behavior): Behavior Label

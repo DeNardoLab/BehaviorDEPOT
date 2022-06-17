@@ -244,8 +244,7 @@ Mahalanobis = [m1_behav_mahal_mean, m1_cmp_mahal_mean, m2_behav_mahal_mean, m2_c
 results_table = table(Name, Mean, SD, Z_Mean, Z_SD, Mahalanobis);
 
 %% Save Figures and Table
-save_path = Params.basedir;
-cd(save_path)
+cd ..
 mkdir('DE_Results')
 cd('DE_Results')
 
