@@ -8,8 +8,8 @@ function [data, Params] = importDLCTracking(Params)
     data = [];
     cd(Params.basedir);
     disp('Reading tracking file')
-    % Select CSV/H5 file and Extract 
-    if strcmpi(Params.tracking_fileType, 'csv')
+    % Select CSV/H5 file and Extract Data
+    if strcmpi(Params.tracking_fileType, '.csv')
         if isfield(Params,'tracking_file')
             M = readmatrix(Params.tracking_file);
             data = M';
@@ -44,7 +44,7 @@ function [data, Params] = importDLCTracking(Params)
         end
         part_names = M2(2,2:3:end);
         disp('CSV Loaded');
-    elseif strcmpi(Params.tracking_fileType, 'h5' | 'H5')
+    elseif strcmpi(Params.tracking_fileType, '.h5')
         if isfield(Params,'tracking_file')
             dataAdd = h5read(Params.tracking_file, '/df_with_missing/table');
             dataAddMat = dataAdd.values_block_0(:,:);

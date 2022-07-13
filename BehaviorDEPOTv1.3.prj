@@ -1,14 +1,14 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="2175684430" file="C:\BehaviorDEPOT\BehaviorDEPOTv1.3.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOTv1.3" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="3578417407" file="C:\BehaviorDEPOT\BehaviorDEPOTv1.3.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOTv1.3" target="target.mlapps" target-name="Package App">
     <param.appname>BehaviorDEPOTv1.3</param.appname>
     <param.authnamewatermark>C. Gabriel, Z. Zeidler, B. Jin, L. DeNardo</param.authnamewatermark>
     <param.email />
     <param.company />
     <param.icon />
     <param.icons />
-    <param.summary>BehaviorDEPOT v1.3application for analyzing top-down rodent DLC tracking and automatic behavior classification</param.summary>
+    <param.summary>BehaviorDEPOT v1.3 application for analyzing top-down rodent DLC tracking and automatic behavior classification</param.summary>
     <param.description />
-    <param.screenshot />
+    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tpfecdb93f_b3f2_4f46_9471_3e332119cdf1.png</param.screenshot>
     <param.version>1.3</param.version>
     <param.products.name>
       <item>MATLAB</item>
@@ -37,7 +37,6 @@
       <param.icon />
       <param.icons />
       <param.description />
-      <param.screenshot />
       <param.platforms />
       <param.output />
     </unset>

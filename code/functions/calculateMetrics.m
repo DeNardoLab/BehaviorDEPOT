@@ -10,11 +10,11 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     
     %% Register tracked parts with custom names to known body parts
     
-    % part_list contains list of tracking points of interest. Additional points can be added.
+    % known_part_list contains list of tracking points of interest. Additional points can be added.
     % part_lookup(i) refers to the i_th field in Tracking.Smooth, and returns the ordered
-    % assignment from part_list
+    % assignment from known_part_list
     
-    % Example: if part_list(8), 'Tailbase', is tracked in the 4th field of Tracking.Smooth,
+    % Example: if known_part_list(8), 'Tailbase', is tracked in the 4th field of Tracking.Smooth,
     % part_lookup(4) returns 8
     
     if P.batchSession == 0
@@ -22,50 +22,59 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     end
     
     part_names = Params.part_names;
-    part_list = {'Nose', 'Left_Ear', 'Right_Ear', 'BetwEars', 'Head', 'Neck', 'MidBack', 'RearBack', 'Left_Leg', 'Right_Leg', 'BetwLegs', 'Tailbase', 'Tail', 'Implant_Base', 'Implant', 'Other'};
+    known_part_list = {'Nose', 'Left_Ear', 'Right_Ear', 'BetwEars', 'Head', 'Neck', 'MidBack', 'RearBack', 'Left_Leg', 'Right_Leg', 'BetwLegs', 'Tailbase', 'Tail', 'Implant_Base', 'Implant', 'Other'};
 
     % Prompt user to register body parts, then ask if want to save that list for future use
     if isempty(P.part_save) || isequal(P.part_save, "No")
-        part_lookup = [];
+        part_match_inds = [];
         disp('Select corresponding body part for tracked point labels. Select "Other" if part is not listed')
         for i_part = 1:length(Params.part_names)
             this_part = Params.part_names{i_part};
-            [indx,~] = listdlg('PromptString',{'Select matching body part for:  ', this_part, 'Select "Other" if part not listed'},'SelectionMode','single','ListString',part_list);
-            part_lookup = [part_lookup, indx];
+            [indx,~] = listdlg('PromptString',{'Select matching body part for:  ', this_part, 'Select "Other" if part not listed'},'SelectionMode','single','ListString',known_part_list);
+            part_match_inds = [part_match_inds, indx];
         end 
     else
-        part_lookup = P.part_lookup;
+        part_match_inds = P.part_match_inds;
     end
 
     if isempty(P.part_save)
          dlgTitle    = 'Part list save';
          dlgQuestion = 'Do you wish to use the same part list for all batched analyses?';
-         P.part_save = questdlg(dlgQuestion,dlgTitle, "Yes", "No", "Yes");
+         P.part_save = questdlg(dlgQuestion, dlgTitle, "Yes", "No", "Yes");
          
          if P.part_save == "Yes"
-             P.part_lookup = part_lookup;
+             P.part_match_inds = part_match_inds;
          else
-             P.part_lookup = [];
+             P.part_match_inds = [];
          end
     end
-               
+    
+    close; 
+    
     % create new struct to refer to tracked parts with known names. 
     % 'Other' tracked parts are assigned their original name 
-    % assigns untracked parts from part_list as empty
+    % assigns untracked parts from known_part_list as empty
     trackcell = struct2cell(Tracking.Smooth);
     tempTracking = struct;
-    for i = 1:length(part_list)
-        if ~isempty(find(part_lookup == i))
-            if string(part_list{i}) ~= "Other" 
-                tempTracking.(part_list{i}) = trackcell{(find(part_lookup == i))};
+
+    % Scan through each known part
+    for i = 1:length(known_part_list)
+        match_check = find(part_match_inds == i);
+        % Check if there is a match for current known part (match_check)
+        if ~isempty(match_check)
+            % If not 'Other', save to tempTracking with registered part
+            if ~strcmp(known_part_list{i}, 'Other')
+                tempTracking.(known_part_list{i}) = trackcell{match_check};
+            % If 'Other', save to tempTracking with original name
             else
-                tempTracking.(part_names{i}) = trackcell{(find(part_lookup == i))};
+                for ii = match_check
+                    tempTracking.(part_names{ii}) = trackcell{ii};
+                end
             end
         else
-            tempTracking.(part_list{i}) = [];
+            tempTracking.(known_part_list{i}) = [];
         end
     end
-    tempTracking = rmfield(tempTracking, 'Other');
 
     %% METRIC CALCULATIONS
     % When adding new metrics, use tempTracking struct to perform
@@ -138,11 +147,11 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     try
         Metrics.Dist.BetwEarsTailbase = sqrt((tempTracking.Tailbase(1,:)-tempTracking.BetwEars(1,:)).^2 + (tempTracking.Tailbase(2,:)-tempTracking.BetwEars(2,:)).^2) / Params.px2cm;
     end
-    %Head-MidBack Distance
+    % Head-MidBack Distance
     try
         Metrics.Dist.HeadMidBack = sqrt((tempTracking.MidBack(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.MidBack(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
     end
-    %Head-RearBack Distance
+    % Head-RearBack Distance
     try
         Metrics.Dist.HeadRearBack = sqrt((tempTracking.RearBack(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.RearBack(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
     end
