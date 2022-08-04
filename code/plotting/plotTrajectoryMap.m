@@ -9,6 +9,7 @@ Y = Metrics.Location(2,:);
 beh_icons = {'ksquare', 'k^','kdiamond', 'kv', 'k+', 'k*', 'kpentagram', 'khexagram'};
 beh_name = fieldnames(Behavior);
 beh_cell = struct2cell(Behavior);
+beh_check = zeros(size(beh_cell));
 
 for i = 1:size(beh_cell, 1)
     to_check = fieldnames(beh_cell{i});
@@ -20,11 +21,13 @@ for i = 1:size(beh_cell, 1)
     end
 end
 
+
 beh_name = beh_name(logical(beh_check));
 beh_cell = beh_cell(logical(beh_check));
 
-
-if Params.plotBeh
+% Check if plotBeh preference is on AND that there are behaviors to plot
+% (beh_check)
+if (Params.plotBeh) && (sum(beh_check)>0)
     for i = 1:length(beh_cell)   % loop through behaviors
         figure;
         I = imshow(frame1);
@@ -103,6 +106,5 @@ else
 end
 
 end
-
 
 

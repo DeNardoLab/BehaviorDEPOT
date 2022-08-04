@@ -7,13 +7,13 @@ if P.batchSession == 0
     if ~ispc
         menu('Select tracking file', 'OK')
     end
-    [ft pt] = uigetfile('*.*','Select tracking file');
+    [ft, pt] = uigetfile('*.*','Select tracking file');
     cd(pt)
     disp('Select video file'); % point to folder for analysis
     if ~ispc
         menu('Select video file', 'OK')
     end
-    [fv pv] = uigetfile('*.*','Select video file');
+    [fv, pv] = uigetfile('*.*','Select video file');
     basedir = pt;
     P.tracking_file = [pt ft];
     P.video_file = [pv fv];
@@ -47,7 +47,7 @@ for j = 1:size(P.video_folder_list, 2)
         else
             video_folder = strcat(P.video_directory, '/', current_video);
         end
-        
+
         cd(video_folder) %Folder with data files
         basedir = pwd; %Assign current folder to basedir
 
@@ -66,7 +66,7 @@ for j = 1:size(P.video_folder_list, 2)
             video_name = V.name;
         catch ME
             if (strcmp(ME.identifier,'MATLAB:needMoreRhsOutputs'))
-                msg = ['Error loading video']; % common error is to not have correct video file type selected
+                msg = 'Error loading video'; % common error is to not have correct video file type selected
                 causeException = MException('MATLAB:needMoreRhsOutputs',msg);
                 ME = addCause(ME,causeException);
             end
@@ -74,9 +74,6 @@ for j = 1:size(P.video_folder_list, 2)
         end
 
         clear V
-
-        % back to script dir
-        cd(P.script_dir)
     
         % Collect frames for plots and draw ROIs
         if ispc
@@ -86,18 +83,45 @@ for j = 1:size(P.video_folder_list, 2)
         end
         
         [frame, frame1, frame_idx, P] = videoInterface(full_vid_path, P);
+
+        % Find tracking file
+        h5_search = dir('*.h5');
+        csv_search = dir('*.csv');
+
+        if size(h5_search, 1) == 1
+            tracking_file = h5_search.name;
+        else
+            if size(csv_search, 1) == 1
+                tracking_file = csv_search.name;
+            elseif size(csv_search, 1) == 2
+                csv1_check = contains(csv_search(1).name, 'cue');
+                csv2_check = contains(csv_search(2).name, 'cue');
+                csv_check = [csv1_check, csv2_check];
+                if sum(csv_check) == 1
+                    tracking_file = csv_search(~csv_check).name;
+                end
+            else
+                disp('Error: too many CSV files found in data folder')
+                disp(['Video Folder: ' video_name])
+            end
+        end
+        
     end
     
     %% Draw ROIs included in specific classifiers
     P = drawClassROIs(P, frame);
     
     %% Save parameters to Params structure
-    Params = makeParamsStruct(P);    
+    Params = makeParamsStruct(P);
     Params.basedir = basedir;
     
     if P.batchSession == 0
         Params.tracking_file = P.tracking_file;
         Params.video_file = P.video_file;
+    else
+
+        Params.tracking_file = tracking_file;
+        Params.video_file = video_name;
     end
     
     %% CSV/H5 Registration
@@ -168,7 +192,7 @@ for j = 1:size(P.video_folder_list, 2)
     end
     
     % Plot trajectory map
-    if Params.plotBeh | Params.plotSpace | Params.plotSpaceTime % if plotting behavior, loop through behaviors and make individual figures
+    if (Params.plotBeh) || (Params.plotSpace) || (Params.plotSpaceTime) % if plotting behavior, loop through behaviors and make individual figures
         plotTrajectoryMap(Metrics, frame1, Params, Behavior, analyzed_folder_name);
     end
     
