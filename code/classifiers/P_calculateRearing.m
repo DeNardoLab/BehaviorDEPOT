@@ -11,7 +11,7 @@ function Params = P_calculateRearing()
 
     Params.Rearing.minDuration = 0.5; % Set min duration of behavior bout
     Params.Rearing.ROI_Labels = {'Arena_Floor'};
-    Params.Rearing.windowWidth = 32;
-    Params.Rearing.countThreshold = 10;
+    Params.Rearing.windowWidth = 30;
+    Params.Rearing.countThreshold = 5;
 
 end

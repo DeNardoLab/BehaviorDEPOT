@@ -279,7 +279,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         Metrics.Acceleration.(fn{i_part}) = diff(Metrics.Velocity.(fn{i_part})) / Params.Video.frameRate;
         Metrics.Acceleration.(fn{i_part}) = [Metrics.Acceleration.(fn{i_part})(:,1), Metrics.Acceleration.(fn{i_part})]; % to keep length the same
     end
-  
+
     %% Calculate Distance Traveled
     % tries to find suitable part for body location,
     % otherwise averages all parts together to get location
@@ -311,6 +311,38 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     Metrics.Movement.DistanceTraveled = [0 cumsum(dist_frame)] / Params.px2cm;  % Cumulative distance traveled per frame
     Metrics.Movement.DistanceUnits = 'cm per frame';
     
+    %% Distance from Arena Edge Calculations
+    % Collect video parameters and find 9 points to collect distance from
+    % (4 edges, 4 corners, and center)
+    x_max = Params.Video.frameWidth;
+    y_max = Params.Video.frameHeight;
+
+    % Save coordinates to C structure
+    C.Center = [x_max/2, y_max/2];
+    C.TL_Corner = [0, 0];
+    C.BL_Corner = [0, y_max];
+    C.TR_Corner = [x_max, 0];
+    C.BR_Corner = [x_max, y_max];
+    C.L_Edge = [0, y_max/2];
+    C.B_Edge = [x_max/2, y_max];
+    C.R_Edge = [x_max, y_max/2];
+    C.T_Edge = [x_max/2, 0];
+
+    dist_pts = fieldnames(C);
+    
+    % Calculate distance from each point to animal location (locat)
+    for c = 1:length(dist_pts)
+        
+        this_pt = C.(dist_pts{c});
+        % Find difference between xy location and xy coords of this_pt
+        dist_to_pt = [locat(1,:) - this_pt(1); locat(2,:) - this_pt(2)];
+        
+        % Pythagorean theorem; save to Metrics.Dist
+        Metrics.Dist.(dist_pts{c})  = sqrt(dist_to_pt(1,:).^2 + dist_to_pt(2,:).^2);
+
+        clearvars dist_to_pt
+    end
+
     %Tracking.Misc.PreRegistration = Tracking.Smooth;
     Tracking.Smooth = tempTracking;
     

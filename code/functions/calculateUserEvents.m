@@ -1,14 +1,14 @@
 function [output, Params, P] = calculateUserEvents(Params, P)
     
 % Generate P.reuse_cue_name, if non-existant
-if ~exist('P.reuse_cue_name', 'var')
+if ~isfield(P, 'reuse_cue_name')
     P.reuse_cue_name = [];
 end
 numFrames = Params.numFrames;
 
 % prompt for number of timestamp files
 tf = 0;
-if isempty(Params.cueFile)
+if isempty(Params.cueFile) && ~Params.batchSession
     while ~tf
     [numfiles,tf] = listdlg('PromptString','Number of timestamp files','ListString',{'1','2','3'}, 'SelectionMode','single');
     end
@@ -34,14 +34,12 @@ for f = 1:numfiles
         eventname = P.eventname;    
     end
     
-    if Params.batchSession && isempty(Params.reuse_cue_name)
+    if Params.batchSession && isempty(P.reuse_cue_name)
         resp = questdlg('Re-use time cue name for other batched process files?', '', 'Yes', 'No', 'Yes');
         if isequal(resp,'Yes')
-            Params.reuse_cue_name = 1;
             P.reuse_cue_name = 1;
             P.eventname = eventname;
         elseif isequal(resp,'No')
-            Params.reuse_cue_name = 0;
             P.reuse_cue_name = 0;
         end
     end

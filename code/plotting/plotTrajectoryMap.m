@@ -55,9 +55,9 @@ if (Params.plotBeh) && (sum(beh_check)>0)
         lgnd = [lgnd, i_beh_name];
     
         if Params.do_roi
-            for i = 1:length(Params.roi)
-               plot(polyshape(Params.roi{i}), 'FaceAlpha', 0.1);
-               lgnd = [lgnd, strcat('ROI #',string(i))];
+            for ii = 1:length(Params.roi)
+               plot(polyshape(Params.roi{ii}), 'FaceAlpha', 0.1);
+               lgnd = [lgnd, strcat('ROI #',string(ii))];
             end
         end
     
@@ -65,6 +65,7 @@ if (Params.plotBeh) && (sum(beh_check)>0)
         beh_plot = gcf;   
         cd(analyzed_folder_name)
         savename = strcat(i_beh_name, ' Map');
+        saveas(beh_plot, (savename), 'jpeg');
         savefig(beh_plot, (savename));
         close;
     end
@@ -101,10 +102,11 @@ else
     legend(lgnd);
     sptm_plot = gcf;
     cd(analyzed_folder_name)
-
+    
+    saveas(sptm_plot, (savename), 'jpeg');
     savefig(sptm_plot, (savename));
+    close;
 end
-
 end
 
 

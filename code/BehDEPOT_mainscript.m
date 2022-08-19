@@ -147,7 +147,7 @@ for j = 1:size(P.video_folder_list, 2)
     
     %% Apply Spatial Filter
     if Params.do_roi && Params.num_roi > 0
-        [Params, Behavior.Spatial] = calculateUserROI(Metrics, Params);
+        [Params, Metrics, Behavior.Spatial] = calculateUserROI(Metrics, Params);
     else
         [Params, ~] = calculateUserROI(Metrics, Params);
     end
