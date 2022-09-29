@@ -14,7 +14,7 @@ function output = calculateROI(Behavior, Metrics, Params)
             output.(roi_name).inROIvector= in_roi';
 
              for i = 1:length(beh_cell)   % loop through behaviors
-                i_beh_name = string(beh_name(i));  % load behvavior name
+                i_beh_name = string(beh_name(i));  % load behavior name
                 i_beh_vec = Behavior.(i_beh_name).Vector;   % load behavior vector
                 in_roi_beh = find(in_roi == 1 & i_beh_vec == 1);  % find frames when location is within ROI and behavior occurred
                 roi_beh_vec = zeros(1, length(loc));
