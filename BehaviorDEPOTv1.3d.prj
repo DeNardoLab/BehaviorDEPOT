@@ -1,14 +1,14 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="3448191248" file="C:\BehaviorDEPOT\BehaviorDEPOTv1.3d.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOTv1.3d" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="1537069912" file="C:\BehaviorDEPOT\BehaviorDEPOTv1.3d.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOTv1.3d" target="target.mlapps" target-name="Package App">
     <param.appname>BehaviorDEPOTv1.3d</param.appname>
     <param.authnamewatermark>C. Gabriel, Z. Zeidler, B. Jin, L. DeNardo</param.authnamewatermark>
     <param.email />
     <param.company />
     <param.icon />
     <param.icons />
-    <param.summary>BehaviorDEPOT v1.3d application for analyzing top-down rodent DLC tracking and automatic behavior classification</param.summary>
+    <param.summary>BehaviorDEPOT v1.3d application for analyzing top-down rodent tracking and automatic behavior classification</param.summary>
     <param.description />
-    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tp752f3d62_a4b3_498d_b88b_28d7fa54e902.png</param.screenshot>
+    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tp81a4e662_52e8_4dc4_beb2_d1513267ec5c.png</param.screenshot>
     <param.version>1.3</param.version>
     <param.products.name />
     <param.products.id />
@@ -33,7 +33,7 @@
     </fileset.main>
     <fileset.depfun />
     <fileset.resources>
-      <file>${PROJECT_ROOT}\codebase</file>
+      <file>${PROJECT_ROOT}\code</file>
     </fileset.resources>
     <fileset.package />
     <build-deliverables>
