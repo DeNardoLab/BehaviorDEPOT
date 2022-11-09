@@ -11,8 +11,13 @@ function Jumping = calculateJumping(Params, Tracking, Metrics)
   
     minVelocity = Params.Jumping.minVelocity;
     minDuration = Params.Jumping.minDuration;
-
-    body_velocity = nanmean([Metrics.Velocity.Head; Metrics.Velocity.RearBack]);
+    
+    try
+        body_velocity = nanmean([Metrics.Velocity.Head; Metrics.Velocity.RearBack]);
+    catch
+        body_velocity = nanmean([Metrics.Velocity.Head; Metrics.Velocity.Tailbase]);
+    end
+    
     jumping_velocity_nans = isnan(body_velocity);
     jumping_velocity_data = ~jumping_velocity_nans;
     jumping_nan_inds = find(jumping_velocity_nans);

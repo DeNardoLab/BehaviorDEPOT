@@ -15,9 +15,7 @@ function Escape = calculateEscape(Params, Tracking, Metrics)
     try
         body_velocity = nanmean([Metrics.Velocity.Head; Metrics.Velocity.RearBack]);
     catch
-        try
-            body_velocity = nanmean(Metrics.Velocity.Head);
-        end
+        body_velocity = nanmean([Metrics.Velocity.Head; Metrics.Velocity.Tailbase]);
     end
     
     escape_velocity_nans = isnan(body_velocity);

@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="1537069912" file="C:\BehaviorDEPOT\BehaviorDEPOTv1.3d.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOTv1.3d" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="4045954292" file="C:\BehaviorDEPOT\BehaviorDEPOTv1.3d.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOTv1.3d" target="target.mlapps" target-name="Package App">
     <param.appname>BehaviorDEPOTv1.3d</param.appname>
     <param.authnamewatermark>C. Gabriel, Z. Zeidler, B. Jin, L. DeNardo</param.authnamewatermark>
     <param.email />
