@@ -1,7 +1,8 @@
-function [frame, frame1, frame_idx, P] = videoInterface(video_name, P)
+function [Frame, P] = videoInterface(video_name, P)
 
     % warn user this may take a while
     disp('Loading video. May take some time depending on size of video.')
+    
     % Create video object (.avi or .mp4)
     vid = VideoReader(video_name);
     
@@ -15,14 +16,22 @@ function [frame, frame1, frame_idx, P] = videoInterface(video_name, P)
     disp('Video Loaded');
     P.Video.location = video_name;
     
-    % load frames
-    frame_idx = randi(vid.numFrame,1);  % take random frame to verify tracking
-    frame = read(vid, frame_idx);
-    frame1 = read(vid, 1);   % take first frame for trajectory plotting 
-    
+    % Collect 5 random frames
+    frame_idx = randi(vid.numFrame,1, 5);  % take random frame to verify tracking
+
+    Frame = struct();
+
+    for i = frame_idx
+        Frame.(['n' int2str(i)]) = read(vid, i); 
+    end
+
+    frame_ids = fieldnames(Frame);
+    frame = Frame.(frame_ids{randi(5,1)});
+
     % Draw ROI
     P.roi_limits = [];
     roi_name = [];
+
     if P.do_ROI
         for r = 1:P.number_ROIs
             disp(['Select ROI # ' num2str(r)]);

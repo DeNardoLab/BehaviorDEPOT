@@ -19,7 +19,8 @@ function pointValidation = plotPointTracking(Tracking, Params, frame, frame_idx)
     
     for i = 1:length(part_names)
         i_part = string(part_names{i});
-        plot(Tracking.Smooth.(i_part)(1,frame_idx), Tracking.Smooth.(i_part)(2,frame_idx),'o', 'MarkerSize', 5, 'LineWidth', 2);
+        this_part = Tracking.Smooth.(i_part);
+        plot(this_part(1,frame_idx), this_part(2,frame_idx), 'o', 'MarkerSize', 5, 'LineWidth', 2);
         leg{i} = i_part;
     end
     legend(string(leg));
