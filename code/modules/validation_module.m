@@ -23,8 +23,8 @@ homedir = pwd;
 cd(data_directory)
 
 % Search input directory
-BD_search = dir('**/*_analyzed');
-hB_search = dir('**/hB_*');
+BD_search = dir(['**/', analyzed_ID]);
+hB_search = dir(['**/', hB_ID]);
 
 BD_paths = {BD_search.folder};
 hB_paths = {hB_search.folder};
@@ -61,8 +61,6 @@ for i = find(BD_match)
 end
 
 %% Validation
-%to_validate = prepBatch(data_directory);
-
 for file_num = 1:length(to_validate)
     % cd into correct directory
     d_folder = to_validate(file_num).path{:};
@@ -79,11 +77,24 @@ for file_num = 1:length(to_validate)
     
     VResults.ReferenceFiles(file_num, :) = string(ref_file);
     VResults.ComparisonFiles(file_num, :) = string(comp_dir);
-    
+
+    % Pull out spatial info and add to comp_fields
+    if isfield(Behavior, 'Spatial')
+        fs = fieldnames(Behavior.Spatial);
+        for f = 1:size(fs, 1)
+            if isfield(Behavior.Spatial.(fs{f}), 'Vector')
+                Behavior.(fs{f}) = Behavior.Spatial.(fs{f});
+            end
+        end
+    end
+
     % Identify relevant data from Behavior and hBehavior
     ref_fields = fieldnames(hBehavior);
     comp_fields = fieldnames(Behavior);
-    
+
+    to_remove = strcmp(comp_fields, 'Spatial') | strcmp(comp_fields, 'Temporal');
+    comp_fields(to_remove) = [];
+
     if file_num == 1
         [s,v] = listdlg('PromptString','Select behavior to validate:',...
         'SelectionMode','single','ListString',comp_fields);
@@ -151,23 +162,24 @@ results_folder = 'ValidationResults';
 mkdir(results_folder)
 cd(results_folder)
 
+cur_time = datestr(now, 'mmm-dd HH:MM');
+
 % Plot and Save Figures
 if length(to_validate) > 1
     fig1 = plotValidationPerformance(VResults);
-    saveas(fig1, 'PerformanceByVideo.jpg')
+    saveas(fig1, [behav_to_validate, '_PerformanceByVideo_', cur_time, '.jpg'])
     close(fig1)
     
     fig2 = plotValidationAvg(VResults);
-    saveas(fig2, 'AvgPerformance.jpg')
+    saveas(fig2, [behav_to_validate, '_AvgPerformance_', cur_time, '.jpg'])
     close(fig2) 
 else
     fig1 = plotValidationSingle(VResults);
-    saveas(fig1, 'Performance.jpg')
+    saveas(fig1, [behav_to_validate, '_Performance_', cur_time, '.jpg'])
     close(fig1)
 end
 
-results_filename_ext = strcat(behav_to_validate,'_Validation', '.mat');
-save(results_filename_ext, 'VResults')
+save([behav_to_validate,'_Validation', '.mat'], 'VResults')
 cd(data_directory)
 clearvars -except VResults
 disp('Validation metrics calculated and saved in data directory');

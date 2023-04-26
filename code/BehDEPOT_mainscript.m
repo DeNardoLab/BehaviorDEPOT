@@ -112,8 +112,10 @@ for j = 1:size(P.video_folder_list, 2)
         
         % Plot trajectory map
         if (Params.plotBeh) || (Params.plotSpace) || (Params.plotSpaceTime) % if plotting behavior, loop through behaviors and make individual figures
+            frame_idx = fieldnames(Params.Frame);
+            frame = Params.Frame.(frame_idx{randi(size(frame_idx,1))});
             plotTrajectoryMap(Metrics, frame, Params, Behavior, analyzed_folder_name);
-        end   
+        end
     end
 
     %% Prep for next session (if batch)

@@ -80,7 +80,7 @@ function convertHumanAnnotations(table_filename, total_frames, output_filename)
         hBehavior.(behav_list{i}).Bouts = [];
         hBehavior.(behav_list{i}).Length = [];
         hBehavior.(behav_list{i}).Count = 0;
-        hBehavior.(behav_list{i}).Vector = zeros(total_frames, 1);
+        hBehavior.(behav_list{i}).Vector = zeros(1, total_frames);
     end
 
     %% Use table inds to access human labels and transform data
@@ -109,7 +109,7 @@ function convertHumanAnnotations(table_filename, total_frames, output_filename)
     for i = 1:length(behav_list)
        
         hBehavior.(behav_list{i}).Length = hBehavior.(behav_list{i}).Bouts(:,2) - hBehavior.(behav_list{i}).Bouts(:,1);
-        hBehavior.(behav_list{i}).Count = length(hBehavior.(behav_list{i}).Bouts);
+        hBehavior.(behav_list{i}).Count = size(hBehavior.(behav_list{i}).Bouts, 1);
         
         for j = 1:size(hBehavior.(behav_list{i}).Bouts, 1)
             hBehavior.(behav_list{i}).Vector(hBehavior.(behav_list{i}).Bouts(j,1):hBehavior.(behav_list{i}).Bouts(j,2)) = 1;
@@ -117,7 +117,6 @@ function convertHumanAnnotations(table_filename, total_frames, output_filename)
     end
 
     %% Save Results
-    
     
     if exist('output_filename')
         output_filename = strcat(output_filename, '.mat')
