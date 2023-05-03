@@ -99,7 +99,8 @@ for j = 1:size(P.video_folder_list, 2)
         if P.batchSession == 1
             analyzed_folder_name = strcat(P.basedir, addSlash(), P.video_folder_list(j), addSlash(), P.video_folder_list(j), '_analyzed');
         else
-            analyzed_folder_name = strcat(P.video_file,"_analyzed");
+            save_name = split(P.video_file, '.');
+            analyzed_folder_name = strcat(save_name{1}, '_analyzed');
         end
         
         saveBehAnalysis(analyzed_folder_name, Params, Behavior);

@@ -162,7 +162,7 @@ results_folder = 'ValidationResults';
 mkdir(results_folder)
 cd(results_folder)
 
-cur_time = datestr(now, 'mmm-dd HH:MM');
+cur_time = datestr(now, 'mmm_dd_HHMM');
 
 % Plot and Save Figures
 if length(to_validate) > 1

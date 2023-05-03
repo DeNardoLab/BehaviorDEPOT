@@ -10,14 +10,14 @@ function Tracking = smoothTracking_custom(Tracking, Params)
     % time = time stamps of position data
     % ux, uy = position data
 
+    tic;
+    
     smoothMethod = Params.Smoothing.method;
     smoothSpan = Params.Smoothing.span;
     part_names = Params.part_names;
 
-    
     for i = 1:length(part_names)
         i_part = part_names{i};
-        time = (1:size(Tracking.Raw.(i_part), 2))';
         ux = Tracking.Raw.(i_part)(1,:)';
         uy = Tracking.Raw.(i_part)(2,:)';
         x = smooth(ux, smoothSpan, smoothMethod);
@@ -29,6 +29,8 @@ function Tracking = smoothTracking_custom(Tracking, Params)
         Tracking.Smooth.(i_part)(1,:) = fillmissing(Tracking.Smooth.(i_part)(1,:), 'spline');
         Tracking.Smooth.(i_part)(2,:) = fillmissing(Tracking.Smooth.(i_part)(2,:), 'spline');
     end
-
+    
     disp(['Data smoothed using ', smoothMethod, ' method and stored in Tracking.Smooth']);
+    tm = toc;
+    disp(['Smoothing completed in ' num2str(tm/60), ' minutes' ]);
 end

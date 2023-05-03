@@ -22,7 +22,7 @@ function classifier_optimization_module()
 %% UPDATE TO ALLOW SELECTION OF PARENT DIRECTORY CONTAINING FOLDERS WITH PAIRED ANALZYED AND HB FILES
 %% RUN PARAMETERS FOR ALL SESSIONS (CALCULATE SUMMARY STATS?)
 
-single_sess = False;
+single_sess = false;
 
 if ~ispc
     menu('Select a BehDEPOT (_analyzed) or batch folder to use for optimization', 'OK')
@@ -37,7 +37,7 @@ cd('..')
 D_hB = dir('*hB*.mat');
 
 if size(D_a, 1) + size(D_hB, 1) == 2
-    single_sess = True;
+    single_sess = true;
 end
 
 if single_sess
@@ -45,9 +45,11 @@ if single_sess
     BD_filepath = input_filepath;
     data_dirs = {fileparts(BD_filepath)};
 
-elseif batch_sess
+elseif ~single_sess
     % Organize the data dirs (dirDirs)
     data_dirs = dirDirs(input_filepath);
+    to_remove = contains(data_dirs, 'Results');
+    data_dirs(to_remove) = [];
 end
 
 module_path = mfilename('fullpath');
@@ -62,7 +64,7 @@ app_path = module_path(1:mp_slash(end-1));
 class_path = [app_path, 'classifiers'];
 
 %% Main Script
-for f = 1:size(data_dirs,1)
+for f = 1:size(data_dirs,2)
 
     cd(data_dirs{f})
 
@@ -82,7 +84,7 @@ for f = 1:size(data_dirs,1)
             return
         end
 
-        analyzed_search = dir('*_analyzed*');
+        analyzed_search = dir('*_analyzed');
         if size(analyzed_search, 1) == 1
             BD_filepath = [analyzed_search.folder, addSlash(), analyzed_search.name];
         else
@@ -93,13 +95,24 @@ for f = 1:size(data_dirs,1)
     end
 
     % Load data from hB file
-    full_hB_path = [hB_path, hB_file];
+    full_hB_path = [hB_path, addSlash(), hB_file];
     load(full_hB_path);
     
+    % Load in data from analyzed filepath
+    cd(BD_filepath)
+    to_load = dir('*.mat');
+        
+    for i = 1:length(to_load)
+        load(to_load(i).name)
+    end
+    
+    testParams = Params;
+    
     if f == 1
-
         % Scan hBehavior contents for behaviors (i.e. structures)
         hB_fields = fieldnames(hBehavior);
+        
+        field_inds = logical(zeros(size(hB_fields)));
         
         for i = 1:length(hB_fields)
             field_inds(i) = isstruct(hBehavior.(hB_fields{i}));
@@ -109,7 +122,7 @@ for f = 1:size(data_dirs,1)
         struct_fields = hB_fields(field_inds); 
         behav_ind = listdlg('PromptString', {'Select behavior to use from hB file'}, 'ListString', struct_fields, 'SelectionMode','single');
         behavior_to_test = struct_fields{behav_ind};
-        ref = hBehavior.(behavior_to_test).Vector;
+        
         
         cd(class_path)
         class_search = dir;
@@ -132,16 +145,10 @@ for f = 1:size(data_dirs,1)
         classifier_noext = extractBefore(classifier, ".");
         class_fn = str2func(classifier_noext);
         
-        % Load in data from analyzed filepath
-        cd(BD_filepath)
-        to_load = dir('*.mat');
-        
-        for i = 1:length(to_load)
-            load(to_load(i).name)
-        end
+        % Move back to data directory
+        cd(data_dirs{f})
         
         % Copy Params and change thresholds
-        testParams = Params;
         thresh_names = fieldnames(testParams.(behavior_to_test));
         
         ind1 = listdlg('PromptString', {'Select 1st parameter to test.'}, 'ListString', thresh_names, 'SelectionMode', 'single');
@@ -157,7 +164,7 @@ for f = 1:size(data_dirs,1)
         end
         
         if strcmp(thresh1, thresh2)
-            answer = inputdlg({thresh1{1}}, 'Input values to test (comma separated)', [1 50]);
+            answer = inputdlg(thresh1(1), 'Input values to test (comma separated)', [1 50]);
             thresh1_values = str2num(answer{1,1});
             thresh2_values = thresh1_values;
         else
@@ -172,7 +179,7 @@ for f = 1:size(data_dirs,1)
         o_results.thresh2 = thresh2;
         o_results.thresh2_values = thresh2_values;
     end
-
+    
     % Run chosen classifier on selected parameter range (multiplexed)
     t1_size = length(thresh1_values);
     t2_size = length(thresh2_values);
@@ -190,6 +197,7 @@ for f = 1:size(data_dirs,1)
         for p2 = 1:length(thresh2_values)
             testParams.(behavior_to_test).(thresh2{1}) = thresh2_values(p2); 
             testBehavior = class_fn(testParams, Tracking, Metrics);
+            ref = hBehavior.(behavior_to_test).Vector;
             cmp = testBehavior.Vector;
             if size(cmp, 2) < size(cmp, 1)
                 cmp = cmp';
@@ -236,8 +244,9 @@ for f = 1:size(data_dirs,1)
     xlabel(thresh2)
     ylabel(thresh1)
     title('Recall')
-    savefig(f1, 'Precision_Recall')
-    saveas(f1, 'Precision_Recall.jpg')
+    f1.WindowState = 'maximized';
+    savefig(f1, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'Precision_Recall'])
+    saveas(f1, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'Precision_Recall.jpg'])
     close(f1)
     
     f2 = figure(2);
@@ -245,8 +254,9 @@ for f = 1:size(data_dirs,1)
     xlabel(thresh2)
     ylabel(thresh1)
     title('F1 Score')
-    savefig(f2, 'F1_Scores')
-    saveas(f2, 'F1 Scores.jpg')
+    f2.WindowState = 'maximized';
+    savefig(f2, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'F1_Scores'])
+    saveas(f2, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'F1 Scores.jpg'])
     close(f2)
     
     %% Organize Data into oResults structure
@@ -263,27 +273,55 @@ for f = 1:size(data_dirs,1)
     oResults.f1_score = f1_score;
     
     %% Save oResults structure
-    save([behavior_to_test, '_oResults.mat'], 'oResults')
+    save([behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, '_oResults.mat'], 'oResults')
     
     %% Save data to group structure
-    o_results.data_filepath(f) = BD_filepath;
-    o_results.hB_file(f) = full_hB_path;
-    o_results.precision(f) = precision;
-    o_results.recall(f) = recall;
-    o_results.f1_score(f) = f1_score;
+    o_results.data_filepath{f} = BD_filepath;
+    o_results.hB_file{f} = full_hB_path;
+    o_results.precision(:, :, f) = precision;
+    o_results.recall(:, :, f) = recall;
+    o_results.f1_score(:, :, f) = f1_score;
 
     %% Save vars needed for batch
-    clearvars -except data_dirs thresh1_values thresh2_values f input_filepath o_results behavior_to_test
+    clearvars -except data_dirs thresh1 thresh1_values thresh2 thresh2_values class_fn f input_filepath o_results behavior_to_test single_sess 
 end
 
 if ~single_sess
     % Generate and save group oResults structure to data_dir
-    o_results.AvgPrecision = mean(o_results.precision);
-    o_results.AvgRecall = mean(o_results.recall);
-    o_results.AvgF1 = mean(o_results.f1_score);
+    o_results.AvgPrecision = mean(o_results.precision,3);
+    o_results.AvgRecall = mean(o_results.recall,3);
+    o_results.AvgF1 = mean(o_results.f1_score,3);
 
     cd(input_filepath)
-
-    save(['Group ' behavior_to_test ' oResults.mat'], 'oResults')
+    
+    %% GROUP FIGURES 1 & 2: Generate Heatmaps of Mean Precision/Recall & F1 Scores versus parameter values
+    f1 = figure(1);
+    subplot(2,1,1)
+    heatmap(compose('%.2f',o_results.thresh2_values), compose('%.2f',o_results.thresh1_values), o_results.AvgPrecision)
+    xlabel(o_results.thresh2)
+    ylabel(o_results.thresh1)
+    title('Precision')
+    subplot(2,1,2)
+    heatmap(compose('%.2f',o_results.thresh2_values), compose('%.2f',o_results.thresh1_values), o_results.AvgRecall)
+    xlabel(o_results.thresh2)
+    ylabel(o_results.thresh1)
+    title('Recall')
+    f1.WindowState = 'maximized';
+    savefig(f1, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg Precision_Recall'])
+    saveas(f1, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg Precision_Recall.jpg'])
+    close(f1)
+    
+    f2 = figure(2);
+    heatmap(compose('%.2f',o_results.thresh2_values), compose('%.2f',o_results.thresh1_values), o_results.AvgF1)
+    xlabel(o_results.thresh2)
+    ylabel(o_results.thresh1)
+    title('F1 Score')
+    f2.WindowState = 'maximized';
+    savefig(f2, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg F1_Scores'])
+    saveas(f2, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg F1_Scores.jpg'])
+    close(f2)
+    
+    oResults = o_results;
+    save(['Group ', behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, ' _oResults.mat'], 'oResults')
 end
 end
