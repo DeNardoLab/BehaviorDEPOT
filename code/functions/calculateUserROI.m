@@ -10,14 +10,14 @@ loc = Metrics.Location; % Set location
 
 if Params.do_roi && Params.num_roi > 0
     all_roi = Params.roi; % Set all ROIs
-    roi_names = Params.roi_name; % Set all ROI names
+    roi_names = Params.roi_names; % Set all ROI names
     [ROIstruct, Metrics] = searchROI(all_roi, roi_names, loc, Params, Metrics);
 end
 
 clearvars all_roi roi_names
-% Add functionality to check and calculate classifier-based ROIs
-% Check Params for structs (potential Behaviors)
 
+%% Check and calculate classifier-based ROIs
+% Check Params for structs (potential Behaviors)
 param_fields = fieldnames(Params);
 struct_check = zeros(size(param_fields));
 

@@ -44,32 +44,32 @@ for j = 1:size(P.video_folder_list, 2)
     full_vid_path = strcat(video_folder_path,addSlash(),video_name);
     
     %% EXTRACT/REGISTER TRACKING FILE
+
+    tracking_type = P.tracking_type;
+
     h5_search = dir('*.h5');
     csv_search = dir('*.csv');
     
-    if size(h5_search, 1) == 1
+    if contains(tracking_type, 'h5')
         tracking_file = h5_search.name;
-    else
-        if size(csv_search, 1) == 1
-            tracking_file = csv_search.name;
-        elseif size(csv_search, 1) == 2
-            csv1_check = contains(csv_search(1).name, 'cue');
-            csv2_check = contains(csv_search(2).name, 'cue');
-            csv_check = [csv1_check, csv2_check];
-            if sum(csv_check) == 1
-                tracking_file = csv_search(~csv_check).name;
+    elseif contains(tracking_type, 'csv')
+        if length(csv_search) > 1  % differentiate cue and tracking csv files
+            [~,vid_name] = fileparts(full_vid_path);
+            for s = 1:length(csv_search)
+                if contains(csv_search(s).name, vid_name) && ~contains(csv_search(s).name, 'cue', 'IgnoreCase', true)
+                    trackfile = s;
+                end
             end
         else
-            disp('Error: too many CSV files found in data folder')
-            disp(['Video Folder: ' video_name])
+            trackfile = 1;
         end
+
+        tracking_file = csv_search(trackfile).name;
     end
 
     P.video_file{j} = full_vid_path;
     P.tracking_file{j} = strcat(video_folder_path,addSlash(),tracking_file);
-
 end
 
 P.basedir = P.video_directory;
-
 end

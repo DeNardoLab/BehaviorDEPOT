@@ -9,7 +9,9 @@ tracking_file = P.tracking_file{j};
 frame_ids = fieldnames(Frame);
 frame_idx = frame_ids{randi(5,1)};
 frame = Frame.(frame_idx);
-frame_idx = str2num(frame_idx(2:end));
+
+%% Draw Custom ROIs
+P = drawROIs(Frame, P);
 
 %% Draw ROIs included in specific classifiers
 P = drawClassROIs(P, frame);

@@ -7,7 +7,6 @@
 %using the smoothed tracking data from Tracking
 
 function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
-    
     %% Register tracked parts with custom names to known body parts
     
     % known_part_list contains list of tracking points of interest. Additional points can be added.
@@ -26,13 +25,22 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
 
     % Prompt user to register body parts, then ask if want to save that list for future use
     if isempty(P.part_save) || isequal(P.part_save, "No")
-        part_match_inds = [];
-        disp('Select corresponding body part for tracked point labels. Select "Other" if part is not listed')
-        for i_part = 1:length(Params.part_names)
-            this_part = Params.part_names{i_part};
-            [indx,~] = listdlg('PromptString',{'Select matching body part for:  ', this_part, 'Select "Other" if part not listed'},'SelectionMode','single','ListString',known_part_list);
-            part_match_inds = [part_match_inds, indx];
-        end 
+        repeat = true;
+        while repeat
+            part_match_inds = [];
+            disp('Select corresponding body part for tracked point labels. Select "Other" if part is not listed')
+            for i_part = 1:length(Params.part_names)
+                this_part = Params.part_names{i_part};
+                [indx,~] = listdlg('PromptString',{'Select matching body part for:  ', this_part, 'Select "Other" if part not listed'},'SelectionMode','single','ListString',known_part_list);
+                part_match_inds = [part_match_inds, indx];
+            end
+            rsp = questdlg('Re-register tracked parts?', 'Confirm Part Tracking', 'Yes', 'No', 'No');
+            if strcmp(rsp, 'Yes')
+                repeat = true;
+            else
+                repeat = false;
+            end
+        end
     else
         part_match_inds = P.part_match_inds;
     end

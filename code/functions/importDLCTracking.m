@@ -8,60 +8,68 @@ function [data, Params] = importDLCTracking(Params)
     data = [];
     cd(Params.basedir);
     disp('Reading tracking file')
-    % Select CSV/H5 file and Extract Data
-    if strcmpi(Params.tracking_fileType, '.csv')
-        if isfield(Params,'tracking_file')
-            M = readmatrix(Params.tracking_file);
-            data = M';
-            M2 = readcell(Params.tracking_file);
-        else
+    % Check if CSV file
+    if contains(Params.tracking_type, 'csv')
+        % Check if tracking_file is known
+        if ~isfield(Params,'tracking_file')
             S = dir('*.csv');
             if length(S) > 1  % differentiate cue and tracking csv files
-                if contains(S(1).name, 'cue')
-                    trackfile = 2;
-                    if ispc
-                        Params.cueFile = [S(1).folder '\' S(1).name];
-                    else
-                        Params.cueFile = [S(1).folder '/' S(1).name];
+                [~,vid_name] = fileparts(Params.video_file);
+                for s = 1:length(S)
+                    if contains(S(s).name, vid_name) && ~contains(S(s).name, 'cue', 'IgnoreCase', true)
+                        trackfile = s;
                     end
-                    
-                elseif contains(S(2).name, 'cue')
-                    trackfile = 1;
-                    if ispc
-                        Params.cueFile = [S(2).folder '\' S(2).name];
-                    else
-                        Params.cueFile = [S(2).folder '/' S(2).name];
-                    end
-                else
-                    disp('Error. Too many .csv files in the folder. Folder should only contain tracking .csv file, and optionally a .csv file for cues');
                 end
             else
                 trackfile = 1;
             end
-            M = readmatrix(S(trackfile).name);
-            data = M';
-            M2 = readcell(S(trackfile).name);
+            Params.tracking_file = [S(trackfile).folder, addSlash(), S(trackfile).name];
         end
-        part_names = M2(2,2:3:end);
-        disp('CSV Loaded');
-    elseif strcmpi(Params.tracking_fileType, '.h5')
-        if isfield(Params,'tracking_file')
-            dataAdd = h5read(Params.tracking_file, '/df_with_missing/table');
-            dataAddMat = dataAdd.values_block_0(:,:);
-        else
-            S = dir('*.h5'); 
-            %List folder contents of .h5 file and assign to S; important to make sure only one .h5 is in current folder
-            dataAdd = h5read(S(1).name,'/df_with_missing/table');
-            dataAddMat = dataAdd.values_block_0(:,:);
+        
+        % Import data from CSV file
+        opts = detectImportOptions(Params.tracking_file);
+        M = readmatrix(Params.tracking_file, 'Range', [4,2]);
+        data = M';
+        M2 = readcell(Params.tracking_file, 'Range', [2,2,2,length(opts.VariableNames)]);        
+        part_names = M2(1:3:end);
+        disp('DeepLabCut CSV Loaded');
+    % Check if H5 file
+    elseif contains(Params.tracking_type, 'h5')
+        if ~isfield(Params,'tracking_file')
+            S = dir('*.h5');
+            if size(S, 1) == 1
+                trackfile = 1;
+            elseif size(S, 1) > 1
+                [~,vid_name] = fileparts(Params.video_file);
+                for s = 1:length(S)
+                    if contains(S(s).name, vid_name)
+                        trackfile = s;
+                    end
+                end
+            end
+            Params.tracking_file = [S(trackfile).folder, addSlash(), S(trackfile).name];
         end
-        %Copy all x,y, and p values for each tracked body part
-        data = [data, dataAddMat];
-        %Store all tracking info in data
-        disp('H5 Loaded');
+        
+        % Collect tracking xy data and likelihood and save to 'data'
+        dataAdd = h5read(Params.tracking_file, '/df_with_missing/table');
+        data = dataAdd.values_block_0;
+
+        % Collect labels from attribute file
+        info = h5readatt(Params.tracking_file, '/df_with_missing/table', 'values_block_0_kind');
+        split_info = split(info, 'V');
+        potential_labels = cell(1, size(split_info, 1));
+
+        for i = 1:length(split_info)
+            temp = split(split_info{i}, newline);
+            potential_labels(i) = temp(1);
+        end
+        
+        part_names = potential_labels([3,7:size(potential_labels,2)]);
+        disp('DeepLabCut H5 Loaded');
     end
     
     % remove characters from names that may break the code
     part_names = cleanText(part_names);
-    
     Params.part_names = part_names;
+
 end

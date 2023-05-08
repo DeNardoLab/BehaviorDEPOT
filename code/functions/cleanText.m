@@ -5,8 +5,8 @@
 function textcells = cleanText(textcells)
 
     for i = 1:length(textcells)  % remove inappropriate characters 
-        textcells{i} = strrep(textcells{i},' ','');
-        textcells{i} = strrep(textcells{i},'-','');
+        textcells{i} = strrep(textcells{i},' ','_');
+        textcells{i} = strrep(textcells{i},'-','_');
         textcells{i} = strrep(textcells{i},'/','');
         textcells{i} = strrep(textcells{i},'\','');
         textcells{i} = strrep(textcells{i},'+','');
