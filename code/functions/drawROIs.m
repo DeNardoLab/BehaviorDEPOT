@@ -6,7 +6,7 @@ frame = Frame.(frame_ids{randi(5,1)});
 
 % Draw ROI
 roi_limits = [];
-roi_name = [];    
+roi_name = [];
 
 if P.do_ROI
     if ~isfield(P, 'reuse_roi_limits')
@@ -94,6 +94,9 @@ if P.do_ROI
         end
         P.roi_limits = roi_limits;
     end
+else
+    P.reuse_roi_names = [];
+    P.reuse_roi_limits = [];
 end
 
 end

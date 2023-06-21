@@ -1,15 +1,15 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="3472228838" file="C:\BehaviorDEPOT\BehaviorDEPOTv1.5.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOTv1.5" target="target.mlapps" target-name="Package App">
-    <param.appname>BehaviorDEPOTv1.5</param.appname>
+  <configuration build-checksum="1607436006" file="C:\BehaviorDEPOT\BehaviorDEPOTv1.51.prj" location="C:\BehaviorDEPOT" name="BehaviorDEPOTv1.51" target="target.mlapps" target-name="Package App">
+    <param.appname>BehaviorDEPOTv1.51</param.appname>
     <param.authnamewatermark>C. Gabriel, Z. Zeidler, B. Jin, L. DeNardo</param.authnamewatermark>
     <param.email />
     <param.company />
     <param.icon />
     <param.icons />
-    <param.summary>BehaviorDEPOT v1.5 application for analyzing top-down rodent DLC tracking and automatic behavior classification</param.summary>
+    <param.summary>BehaviorDEPOT v1.51 application for analyzing top-down rodent DLC tracking and automatic behavior classification</param.summary>
     <param.description />
-    <param.screenshot>C:\Users\chris\AppData\Local\Temp\tp4242d19d_92c3_440d_bb75_befab9f77aa2.png</param.screenshot>
-    <param.version>1.5</param.version>
+    <param.screenshot />
+    <param.version>1.51</param.version>
     <param.products.name>
       <item>MATLAB</item>
       <item>Curve Fitting Toolbox</item>
@@ -43,6 +43,7 @@
       <param.icon />
       <param.icons />
       <param.description />
+      <param.screenshot />
       <param.platforms />
       <param.output />
     </unset>

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<toolset id="user_apps_toolset" template="false">
-   <tool app_file_path="./" handler_class="com.mathworks.appmanagement.desktop.ToolboxToolSetExtensionHandler" id="786e8f67-a371-44fa-8876-10a81a869d58" label="BehaviorDEPOT" toolset_id="user_apps_toolset">
-      <callback>matlab.apputil.run('BehaviorDEPOTAPP')</callback>
-      <summary>BehaviorDEPOT v1.0 application for analyzing top-down rodent DLC tracking and automatic behavior classification</summary>
-      <parent_tool id="my_apps" toolset_id="apps_toolset"/>
-   </tool>
-</toolset>
