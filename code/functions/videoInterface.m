@@ -17,7 +17,7 @@ disp('Video Loaded');
 P.Video.location = video_name;
 
 % Collect 5 random frames
-frame_idx = randi(vid.numFrame,1, 5);  % take random frame to verify tracking
+frame_idx = randi(vid.numFrame, 1, 5);  % take random frame to verify tracking
 
 Frame = struct();
 

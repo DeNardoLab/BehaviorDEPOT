@@ -1,16 +1,9 @@
 %plotPointTracking
 
-%INPUT: Tracking, Params, frame, frame index
-%OUTPUT: Behavior.Freezing structure
-
-%FUNCTION: calculate the freezing frames via transformation of data from
-%the Metrics structure and save into Behavior structure
-
-% Future: Calculate average velocity of body; test in place of
-% RearBackVelocity
-
 function pointValidation = plotPointTracking(Tracking, Params, frame, frame_idx)
     % visual verification of point tracking and body part indexing
+    frame_idx = str2num(frame_idx(2:end));
+
     part_names = Params.part_names;
     leg = {};
     figure('Name','Example point alignment and body part indexing');

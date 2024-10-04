@@ -20,7 +20,7 @@ if P.do_ROI
                 if r > 1
                    hold on;
                    for nroi = 1:(r-1)
-                       plot(polyshape(P.roi_limits{nroi}), 'FaceAlpha', 0.25)
+                       plot(polyshape(roi_limits{nroi}), 'FaceAlpha', 0.25)
                    end
                 end
                 

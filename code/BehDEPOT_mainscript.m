@@ -32,7 +32,8 @@ for j = 1:size(P.video_folder_list, 2)
         if P.batchSession == 1
             analyzed_folder_name = strcat(P.basedir, addSlash(), P.video_folder_list(j), addSlash(), P.video_folder_list(j), '_analyzed');
         else
-            analyzed_folder_name = strcat(P.video_file,"_analyzed");
+            [~,vid_no_ext] = fileparts(P.video_file);
+            analyzed_folder_name = strcat(vid_no_ext, "_analyzed");
         end
         
         saveDataPrep(analyzed_folder_name, Params, Tracking, Metrics);

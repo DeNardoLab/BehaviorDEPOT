@@ -1,15 +1,13 @@
 % T-Maze Classifier
 % C.G. 3/1/22
-% Contact: cjgabrie@ucla.edu
 
-%INPUT: Params, Tracking, Metrics (from BehaviorDEPOT output)
-%OUTPUT: TMaze Structure
+% INPUT: Params, Metrics (from BehaviorDEPOT output)
+% OUTPUT: TMaze Structure
 
 % FUNCTION: Classify total & percent time (in s), distance traveled (in cm), and number of
 %           entries into each ROI
 
 % PARAMS:
-
 % 1) windowWidth: for convolving inROI vectors
 % 2) countThreshold: for convolving inROI vectors
 % 3) ROI_Labels:
@@ -47,11 +45,13 @@ for i = 1:length(all_ROIs)
     all_ROIs{i} = convolveFrames(all_ROIs{i}, Params.TMaze.windowWidth, Params.TMaze.countThreshold);
 end
 
-%% Analysis
+%% TMaze Analysis
 
+% Collect frame-wise distance traveled
 dist_traveled_frame = Metrics.Movement.DistanceTraveled;
 
 for i = 1:length(all_ROIs)
+
     % Calculate percent time in each arm (o1, o2, c1, c2) + center
     TMaze.(roi_names{i}).Bouts = findStartStop(all_ROIs{i});
     TMaze.(roi_names{i}).Vector = all_ROIs{i};

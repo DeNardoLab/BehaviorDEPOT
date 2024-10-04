@@ -1,3 +1,20 @@
+%% BehaviorDEPOT Data Prep Module
+% C.G. 2/24/22
+
+% PURPOSE: Import user input from BehaviorDEPOT GUI (stored in P) and apply
+% to run 'j'; performs pose registration, ROI drawing interface, data smoothing/interpolation, and metric calculation 
+
+% INPUTS:
+% P: Structure array of user parameters imported from GUI
+% j: Counting variable (integer) for batch analysis runs
+
+% OUTPUTS:
+% Params: Structure array of parameters for current run
+% Tracking: Structure array of raw and smoothed pose tracking data
+% Metrics: Structure array of extracted metrics from registered animal
+% P: User input structure to be run on future runs; includes updates for
+%    reused-ROI and part registration 
+
 function [Params, Tracking, Metrics, P] = BD_dataPrep(P, j)
 
 %% Select current dataset
