@@ -18,6 +18,6 @@ function IR_disagreement(IR_Results, behavior, save_fig)
     end
     
     if save_fig == 1
-        saveas(gcf, 'IR_Disagreement.png')
+        saveas(gcf, fullfile(IR_Results.working_directory, 'IR_Disagreement.png'))
     end
 end

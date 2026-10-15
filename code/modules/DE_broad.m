@@ -5,15 +5,14 @@
 function DE_broad(analyzed_filepath, hB_path, hB_file)
 
 % Load BD data
-cd(analyzed_filepath)
-to_load = dir('*.mat');
+to_load = dir(fullfile(analyzed_filepath, '*.mat'));
 
 for i = 1:length(to_load)
-    load(to_load(i).name)
+    load(fullfile(to_load(i).folder, to_load(i).name))
 end
 
 % Load hB file
-load([hB_path, hB_file])
+load(fullfile(hB_path, hB_file))
 
 hB_list = fieldnames(hBehavior);
 hB_behavs = string();
@@ -47,7 +46,7 @@ coef_table = deGLM.Coefficients;
 coef = coef_table.Estimate;
 
 %% Get Rid of Bad Metrics from Metric_array
-to_remove = -1 < coef < 1;
+to_remove = getBroadMetricRemovalMask(coef, numel(metric_labels));
 metric_array(:,to_remove) = [];
 metric_labels(to_remove) = [];
 
@@ -63,23 +62,21 @@ while tf
 end
 
 %% Run New GLM
-deGLM = fitglm(metric_array, behav_vector, 'Distribution', 'binomial')
+deGLM = fitglm(metric_array, behav_vector, 'Distribution', 'binomial');
 coef_table = deGLM.Coefficients;
 coef = coef_table.Estimate;
 
 %% Generate Predictions based on GLM / Assess Performance
 % Generate ranked order based on coefficients
-[ranked, old_inds] = sort(coef(2:end));
+[~, old_inds] = sort(coef(2:end));
 ranked_list = [metric_labels(old_inds)];
 
 %% Save GLM Equation & Relevant Data
-cd ..
-mkdir('DE_Results')
-cd('DE_Results')
-mkdir('Broad')
-cd('Broad')
-save('GLM Model', 'deGLM')
-save('ranked_list', 'ranked_list')
-save('coefficient_table', 'coef_table')
+[data_folder, ~] = fileparts(analyzed_filepath);
+results_folder = fullfile(data_folder, 'DE_Results', 'Broad');
+mkdir(results_folder)
+save(fullfile(results_folder, 'GLM Model'), 'deGLM')
+save(fullfile(results_folder, 'ranked_list'), 'ranked_list')
+save(fullfile(results_folder, 'coefficient_table'), 'coef_table')
 
 end

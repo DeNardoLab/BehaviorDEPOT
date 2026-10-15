@@ -20,6 +20,10 @@ function [Params, Tracking, Metrics, P] = BD_dataPrep(P, j)
 %% Select current dataset
 video_file = P.video_file{j};
 tracking_file = P.tracking_file{j};
+if P.batchSession == 1 && isfield(P, 'cueFile') && iscell(P.cueFile) && ...
+        numel(P.cueFile) == numel(P.video_file)
+    P.currentCueFile = P.cueFile{j};
+end
 
 %% Run video interface
 [Frame, P] = videoInterface(video_file, P);
@@ -45,17 +49,14 @@ Params.Frame = Frame;
 Params.numFrames = size(data, 2);
 
 %% Convert data to Tracking structure and apply hampel correction
-cd(P.script_dir);
 Tracking = genTracking_custom(data, Params);
 disp(['Tracked ' num2str(length(Params.part_names)) ' points']);
 
 %% Smooth Tracking Data
 Tracking = smoothTracking_custom(Tracking, Params);
 
-%% Visual verification of point tracking and body part indexing
-Plots.pointValidation = plotPointTracking(Tracking, Params, frame, frame_idx);
-
 %% Metric Calculations
-[Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P);
+[Metrics, Tracking, Params, P] = calculateMetrics( ...
+    Tracking, Params, P, frame, frame_idx);
 
 end

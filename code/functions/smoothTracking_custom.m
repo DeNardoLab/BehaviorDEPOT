@@ -21,13 +21,14 @@ function Tracking = smoothTracking_custom(Tracking, Params)
     y_data = zeros(size(x_data));
     smooth_x_data = zeros(size(x_data));
     smooth_y_data = zeros(size(x_data));
+    useParfor = Params.Smoothing.useParfor;
 
     for i = 1:length(part_names)
         x_data(i,:) = Tracking.Raw.(part_names{i})(1,:);
         y_data(i,:) = Tracking.Raw.(part_names{i})(2,:);
     end
     
-    if Params.Smoothing.useGPU
+    if useParfor
         disp('Smoothing using parallel processing')
         parfor i = 1:length(part_names)
             ux = x_data(i,:)';
@@ -43,7 +44,7 @@ function Tracking = smoothTracking_custom(Tracking, Params)
             smooth_y_data(i,:) = fillmissing(smooth_y_data(i,:), 'spline');
         end
     else
-        disp('Smoothing using CPU')
+        disp('Smoothing using serial processing')
         for i = 1:length(part_names)
             ux = x_data(i,:)';
             uy = y_data(i,:)';

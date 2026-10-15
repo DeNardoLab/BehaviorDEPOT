@@ -53,19 +53,25 @@ dist_traveled_frame = Metrics.Movement.DistanceTraveled;
 for i = 1:length(all_ROIs)
 
     % Calculate percent time in each arm (o1, o2, c1, c2) + center
-    TMaze.(roi_names{i}).Bouts = findStartStop(all_ROIs{i});
+    roi_bouts = findStartStop(all_ROIs{i});
+    TMaze.(roi_names{i}).Bouts = roi_bouts;
+    TMaze.(roi_names{i}).Count = size(roi_bouts, 1);
+    if isempty(roi_bouts)
+        TMaze.(roi_names{i}).Length = [];
+    else
+        TMaze.(roi_names{i}).Length = roi_bouts(:,2) - roi_bouts(:,1);
+    end
     TMaze.(roi_names{i}).Vector = all_ROIs{i};
     TMaze.(roi_names{i}).TotalTime = sum(all_ROIs{i}) / fps;
     TMaze.(roi_names{i}).PercentTime = sum(all_ROIs{i}) / numFrames;
     
-    % Collect start/stop inds for each roi
-    roi_bouts = findStartStop(all_ROIs{i});
-    
     % Calculate # of Entries into each ROI
-    TMaze.(roi_names{i}).Entries = size(roi_bouts, 1);
+    TMaze.(roi_names{i}).Entries = TMaze.(roi_names{i}).Count;
+    TMaze.(roi_names{i}).BoutDist = [];
+    TMaze.(roi_names{i}).DistTraveled = 0;
     
     % Calculate distance traveled in each ROI
-    for ii = 1:size(roi_bouts, 1)
+    if ~isempty(roi_bouts)
         dist_count = zeros(size(roi_bouts));
         dist_count(:,1) = dist_traveled_frame(roi_bouts(:,1));
         dist_count(:,2) = dist_traveled_frame(roi_bouts(:,2));

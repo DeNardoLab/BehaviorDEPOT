@@ -7,8 +7,7 @@
 %FUNCTION: Generate a list of videos for batch analysis
 
 function video_folder_list = prepBatch(video_directory)
-    cd(video_directory)
-    directory_contents = dir;
+    directory_contents = dir(video_directory);
     directory_contents(1:2) = [];
     ii = 0;
 

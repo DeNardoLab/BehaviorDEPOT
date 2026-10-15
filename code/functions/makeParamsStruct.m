@@ -13,7 +13,7 @@ function Params = makeParamsStruct(P)
     %% Smoothing Params
     Params.Smoothing.method = P.smoothMethod;
     Params.Smoothing.span = P.smoothSpan;
-    Params.Smoothing.useGPU = P.use_GPU;
+    Params.Smoothing.useParfor = P.use_Par;
     
     %% Spatial ROI Params
     Params.do_roi = P.do_ROI;
@@ -29,10 +29,16 @@ function Params = makeParamsStruct(P)
 
     %% Misc Params
     Params.px2cm = round(P.px2cm);
-    Params.cueFile = [];
+    if isfield(P, 'currentCueFile')
+        Params.cueFile = P.currentCueFile;
+    elseif isfield(P, 'cueFile')
+        Params.cueFile = P.cueFile;
+    else
+        Params.cueFile = [];
+    end
     Params.batchSession = P.batchSession;
-    if P.batchSession == 1
-        Params.reuse_cue_name = P.reuse_cue_name;
+    if P.batchSession
+        Params.reuse_cue_names = P.reuse_cue_names;
         Params.reuse_roi_names = P.reuse_roi_names;
         Params.reuse_roi_limits = P.reuse_roi_limits;
     end

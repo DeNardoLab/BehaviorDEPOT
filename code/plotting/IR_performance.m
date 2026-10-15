@@ -10,6 +10,6 @@ function IR_performance(IR_Results, behavior, save_fig)
     end
     
     if save_fig == 1
-        saveas(gcf, 'IR_Performance.png')
+        saveas(gcf, fullfile(IR_Results.working_directory, 'IR_Performance.png'))
     end
 end

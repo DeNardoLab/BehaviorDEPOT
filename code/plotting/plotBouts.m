@@ -43,8 +43,7 @@ if sum(beh_check) > 0
         end
          
         bouts_plot = gcf;
-        cd(analyzed_folder_name)
-        savefig(bouts_plot, 'Behavior Bouts');
+        savefig(bouts_plot, fullfile(analyzed_folder_name, 'Behavior Bouts'));
         close;
     end
 end

@@ -6,7 +6,7 @@
 %FUNCTION: Calculate useful metrics for animal behavior classification
 %using the smoothed tracking data from Tracking
 
-function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
+function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P, varargin)
     %% Register tracked parts with custom names to known body parts
     
     % known_part_list contains list of tracking points of interest. Additional points can be added.
@@ -16,36 +16,53 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     % Example: if known_part_list(8), 'Tailbase', is tracked in the 4th field of Tracking.Smooth,
     % part_lookup(4) returns 8
     
-    if P.batchSession == 0
+    if ~isfield(P, 'noninteractive')
+        P.noninteractive = false;
+    end
+    if ~isfield(P, 'part_save')
+        P.part_save = [];
+    end
+
+    if P.batchSession == 0 && ~P.noninteractive
         P.part_save = "No";
     end
     
     part_names = Params.part_names;
-    known_part_list = {'Nose', 'Left_Ear', 'Right_Ear', 'BetwEars', 'Head', 'Neck', 'MidBack', 'RearBack', 'Left_Leg', 'Right_Leg', 'BetwLegs', 'Tailbase', 'Tail', 'Implant', 'Center', 'Other'};
+    known_part_list = {'Nose', 'Left Ear', 'Right Ear', 'BetwEars', 'Head', 'Neck', 'MidBack', 'RearBack', 'Left Leg', 'Right Leg', 'BetwLegs', 'Tailbase', 'Tail', 'Implant', 'Center', 'Other'};
+    struct_part_list = strrep(known_part_list, ' ', '_');
+    preview_frame = [];
+    preview_frame_idx = [];
+    if numel(varargin) >= 2
+        preview_frame = varargin{1};
+        preview_frame_idx = varargin{2};
+    end
 
     % Prompt user to register body parts, then ask if want to save that list for future use
-    if isempty(P.part_save) || isequal(P.part_save, "No")
-        repeat = true;
-        while repeat
-            part_match_inds = [];
-            disp('Select corresponding body part for tracked point labels. Select "Other" if part is not listed')
-            for i_part = 1:length(Params.part_names)
-                this_part = Params.part_names{i_part};
-                [indx,~] = listdlg('PromptString',{'Select matching body part for:  ', this_part, 'Select "Other" if part not listed'},'SelectionMode','single','ListString',known_part_list);
-                part_match_inds = [part_match_inds, indx];
-            end
-            rsp = questdlg('Re-register tracked parts?', 'Confirm Part Tracking', 'Yes', 'No', 'No');
-            if strcmp(rsp, 'Yes')
-                repeat = true;
-            else
-                repeat = false;
-            end
-        end
+    registeredParts = false;
+    if isfield(P, 'part_match_inds') && ~isempty(P.part_match_inds)
+        part_match_inds = P.part_match_inds;
+    elseif P.noninteractive
+        error('BehaviorDEPOT:calculateMetrics:MissingPartRegistration', ...
+            'Noninteractive runs require P.part_match_inds.');
+    elseif isempty(P.part_save) || isequal(P.part_save, "No")
+        default_part_match_inds = loadPartLookupDefaults( ...
+            localPartLookupFolder(P), part_names, known_part_list);
+        part_match_inds = registerTrackedParts( ...
+            part_names, known_part_list, Tracking, preview_frame, preview_frame_idx, ...
+            default_part_match_inds);
+        registeredParts = true;
     else
         part_match_inds = P.part_match_inds;
     end
 
-    if isempty(P.part_save)
+    validatePartMatchInds(part_match_inds, known_part_list, numel(part_names));
+
+    if registeredParts
+        savePartLookupDefaults(localPartLookupFolder(P), part_names, ...
+            part_match_inds, known_part_list);
+    end
+
+    if isempty(P.part_save) && ~P.noninteractive
          dlgTitle    = 'Part list save';
          dlgQuestion = 'Do you wish to use the same part list for all batched analyses?';
          P.part_save = questdlg(dlgQuestion, dlgTitle, "Yes", "No", "Yes");
@@ -55,24 +72,25 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
          else
              P.part_match_inds = [];
          end
+    elseif P.noninteractive
+        P.part_save = "Yes";
+        P.part_match_inds = part_match_inds;
     end
-    
-    close; 
     
     % create new struct to refer to tracked parts with known names. 
     % 'Other' tracked parts are assigned their original name 
-    % assigns untracked parts from known_part_list as empty
+    % assigns untracked parts from struct_part_list as empty
     trackcell = struct2cell(Tracking.Smooth);
     tempTracking = struct;
 
     % Scan through each known part
-    for i = 1:length(known_part_list)
+    for i = 1:length(struct_part_list)
         match_check = find(part_match_inds == i);
         % Check if there is a match for current known part (match_check)
         if ~isempty(match_check)
             % If not 'Other', save to tempTracking with registered part
-            if ~strcmp(known_part_list{i}, 'Other')
-                tempTracking.(known_part_list{i}) = trackcell{match_check};
+            if ~strcmp(struct_part_list{i}, 'Other')
+                tempTracking.(struct_part_list{i}) = trackcell{match_check};
             % If 'Other', save to tempTracking with original name
             else
                 for ii = match_check
@@ -80,7 +98,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
                 end
             end
         else
-            tempTracking.(known_part_list{i}) = [];
+            tempTracking.(struct_part_list{i}) = [];
         end
     end
 
@@ -104,7 +122,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         end
     end
 
-    %% Calculate Head position from LeftEar, RightEar, & Nose
+    %% Calculate Head position from Left_Ear, Right_Ear, & Nose
     if isempty(tempTracking.Head)
         if ~isempty(tempTracking.Left_Ear) && ~isempty(tempTracking.Right_Ear) && ~isempty(tempTracking.Nose)
             tempTracking.Head(1,:) = (tempTracking.Nose(1,:) + tempTracking.Left_Ear(1,:) + tempTracking.Right_Ear(1,:))/3;
@@ -117,7 +135,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     %% Calculate Head Position Using Head-Mounted Implant
     if ~isempty(tempTracking.Left_Ear) && ~isempty(tempTracking.Right_Ear) && ~isempty(tempTracking.Implant)
         tempTracking.Head_Implant(1,:) = (tempTracking.Implant(1,:) + tempTracking.Left_Ear(1,:) + tempTracking.Right_Ear(1,:))/3;
-        tempTracking.Head_Implant(2,:) = (tempTracking.Implant(2,:) + tempTracking.Left_Ear(2,:) + tempTracking.Right_Ear(2,:))/3;
+        tempTracking.Head_Implant(2,:) = (tempTracking.Implant(2,:) + tempTracking.Right_Ear(2,:) + tempTracking.Left_Ear(2,:))/3;
     end
     
     %% Calculate MidBack from BetwEars, BetwLegs, and/or Tailbase, if not tracked directly (MidBack)
@@ -131,13 +149,13 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         end
     end
         
-    %% Calculate BetwShoulders position from LeftEar, RightEar, and MidBack (BetwShoulders)
+    %% Calculate BetwShoulders position from Left_Ear, Right_Ear, and MidBack (BetwShoulders)
     if ~isempty(tempTracking.Left_Ear) && ~isempty(tempTracking.Right_Ear) && ~isempty(tempTracking.MidBack)
         tempTracking.BetwShoulders(1,:) = (tempTracking.Left_Ear(1,:) + tempTracking.Right_Ear(1,:) + tempTracking.MidBack(1,:))/3;
         tempTracking.BetwShoulders(2,:) = (tempTracking.Left_Ear(2,:) + tempTracking.Right_Ear(2,:) + tempTracking.MidBack(2,:))/3;
     end
 
-    %% Calculate RearBack position from LeftLeg, RightLeg, and Tailbase (RearBack)
+    %% Calculate RearBack position from Left_Leg, Right_Leg, and Tailbase (RearBack)
     if isempty(tempTracking.RearBack)
         if ~isempty(tempTracking.Left_Leg) && ~isempty(tempTracking.Right_Leg) && ~isempty(tempTracking.Tailbase)
             tempTracking.RearBack(1,:) = (tempTracking.Left_Leg(1,:) + tempTracking.Right_Leg(1,:) + tempTracking.Tailbase(1,:))/3;
@@ -150,76 +168,87 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
 
     %% Calculate Postural Metrics
     % Nose-Tailbase Distance
-    try
-        Metrics.Dist.NoseTailbase = sqrt((tempTracking.Tailbase(1,:)-tempTracking.Nose(1,:)).^2 + (tempTracking.Tailbase(2,:)-tempTracking.Nose(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.Tailbase) && ~isempty(tempTracking.Nose)
+        Metrics.Dist.NoseTailbase = hypot(tempTracking.Tailbase(1,:) - tempTracking.Nose(1,:), tempTracking.Tailbase(2,:) - tempTracking.Nose(2,:)) / Params.px2cm;
     end
+
     % Head-Tailbase Distance
-    try
-        Metrics.Dist.HeadTailbase = sqrt((tempTracking.Tailbase(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.Tailbase(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.Tailbase) && ~isempty(tempTracking.Head)
+        Metrics.Dist.HeadTailbase = hypot(tempTracking.Tailbase(1,:) - tempTracking.Head(1,:), tempTracking.Tailbase(2,:) - tempTracking.Head(2,:)) / Params.px2cm;
     end
     % BetwEars-Tailbase Distance
-    try
-        Metrics.Dist.BetwEarsTailbase = sqrt((tempTracking.Tailbase(1,:)-tempTracking.BetwEars(1,:)).^2 + (tempTracking.Tailbase(2,:)-tempTracking.BetwEars(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.Tailbase) && ~isempty(tempTracking.BetwEars)
+        Metrics.Dist.BetwEarsTailbase = hypot(tempTracking.Tailbase(1,:) - tempTracking.BetwEars(1,:), tempTracking.Tailbase(2,:) - tempTracking.BetwEars(2,:)) / Params.px2cm;
     end
     % Head-MidBack Distance
-    try
-        Metrics.Dist.HeadMidBack = sqrt((tempTracking.MidBack(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.MidBack(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.MidBack) && ~isempty(tempTracking.Head)
+        Metrics.Dist.HeadMidBack = hypot(tempTracking.MidBack(1,:) - tempTracking.Head(1,:), tempTracking.MidBack(2,:) - tempTracking.Head(2,:)) / Params.px2cm;
     end
     % Head-RearBack Distance
-    try
-        Metrics.Dist.HeadRearBack = sqrt((tempTracking.RearBack(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.RearBack(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.RearBack) && ~isempty(tempTracking.Head)
+        Metrics.Dist.HeadRearBack = hypot(tempTracking.RearBack(1,:) - tempTracking.Head(1,:), tempTracking.RearBack(2,:) - tempTracking.Head(2,:)) / Params.px2cm;
     end
     % Head-LeftLeg Distance
-    try
-        Metrics.Dist.HeadLeftLeg = sqrt((tempTracking.LeftLeg(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.LeftLeg(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.Left_Leg) && ~isempty(tempTracking.Head)
+        Metrics.Dist.HeadLeftLeg = hypot(tempTracking.Left_Leg(1,:) - tempTracking.Head(1,:), tempTracking.Left_Leg(2,:) - tempTracking.Head(2,:)) / Params.px2cm;
     end
     % Head-RightLeg Distance
-    try
-        Metrics.Dist.HeadRightLeg = sqrt((tempTracking.RightLeg(1,:)-tempTracking.Head(1,:)).^2 + (tempTracking.RightLeg(2,:)-tempTracking.Head(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.Right_Leg) && ~isempty(tempTracking.Head)
+        Metrics.Dist.HeadRightLeg = hypot(tempTracking.Right_Leg(1,:) - tempTracking.Head(1,:), tempTracking.Right_Leg(2,:) - tempTracking.Head(2,:)) / Params.px2cm;
     end
     % Nose-LeftLeg Distance
-    try
-        Metrics.Dist.NoseLeftLeg = sqrt((tempTracking.LeftLeg(1,:)-tempTracking.Nose(1,:)).^2 + (tempTracking.LeftLeg(2,:)-tempTracking.Nose(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.Left_Leg) && ~isempty(tempTracking.Nose)
+        Metrics.Dist.NoseLeftLeg = hypot(tempTracking.Left_Leg(1,:) - tempTracking.Nose(1,:), tempTracking.Left_Leg(2,:) - tempTracking.Nose(2,:)) / Params.px2cm;
     end
     % Nose-RightLeg Distance
-    try
-        Metrics.Dist.NoseRightLeg = sqrt((tempTracking.RightLeg(1,:)-tempTracking.Nose(1,:)).^2 + (tempTracking.RightLeg(2,:)-tempTracking.Nose(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.Right_Leg) && ~isempty(tempTracking.Nose)
+        Metrics.Dist.NoseRightLeg = hypot(tempTracking.Right_Leg(1,:) - tempTracking.Nose(1,:), tempTracking.Right_Leg(2,:) - tempTracking.Nose(2,:)) / Params.px2cm;
     end
     % LeftEar-LeftLeg Distance
-    try
-        Metrics.Dist.LeftEarLeftLeg = sqrt((tempTracking.LeftLeg(1,:)-tempTracking.LeftEar(1,:)).^2 + (tempTracking.LeftLeg(2,:)-tempTracking.LeftEar(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.Left_Leg) && ~isempty(tempTracking.Left_Ear)
+        Metrics.Dist.LeftEarLeftLeg = hypot(tempTracking.Left_Leg(1,:) - tempTracking.Left_Ear(1,:), tempTracking.Left_Leg(2,:) - tempTracking.Left_Ear(2,:)) / Params.px2cm;
     end
     % RightEar-RightLeg Distance
-    try
-        Metrics.Dist.RightEarRightLeg = sqrt((tempTracking.RightLeg(1,:)-tempTracking.RightEar(1,:)).^2 + (tempTracking.RightLeg(2,:)-tempTracking.RightEar(2,:)).^2) / Params.px2cm;
+    if ~isempty(tempTracking.Right_Leg) && ~isempty(tempTracking.Right_Ear)
+        Metrics.Dist.RightEarRightLeg = hypot(tempTracking.Right_Leg(1,:) - tempTracking.Right_Ear(1,:), tempTracking.Right_Leg(2,:) - tempTracking.Right_Ear(2,:)) / Params.px2cm;
     end    
     
     %% Calculate Angular Information - Angles are relative to the positive x axis (angle 0 = positive x-axis, pi/-pi = negative x-axis)
     % Calculate Angles in Degrees
     numframes = Params.numFrames;
     
-    if ~isempty(tempTracking.BetwEars)
+    if ~isempty(tempTracking.BetwEars) && ~isempty(tempTracking.Nose)
+        Metrics.degHeadAngle = zeros(1, numframes);
         for i = 1:numframes
-            try 
-                Metrics.degHeadAngle(i) = atan2d(tempTracking.BetwEars(2,i) - tempTracking.Nose(2,i), tempTracking.BetwEars(1,i) - tempTracking.Nose(1,i));
-            end
-            try
-                Metrics.degFullBodyAngle(i) = atan2d(tempTracking.RearBack(2,i) - tempTracking.BetwEars(2,i), tempTracking.RearBack(1,i) - tempTracking.BetwEars(1,i));
-            end
-            try
-                Metrics.degFrontBodyAngle(i) = atan2d(tempTracking.MidBack(2,i) - tempTracking.BetwEars(2,i), tempTracking.MidBack(1,i) - tempTracking.BetwEars(1,i));
-            end
+            Metrics.degHeadAngle(i) = atan2d(tempTracking.BetwEars(2,i) - tempTracking.Nose(2,i), tempTracking.BetwEars(1,i) - tempTracking.Nose(1,i));
         end
     end
 
-    if ~isempty(tempTracking.Tailbase)
+    if ~isempty(tempTracking.BetwEars) && ~isempty(tempTracking.RearBack)
+        Metrics.degFullBodyAngle = zeros(1, numframes);
         for i = 1:numframes
-            try
-                Metrics.degRearBodyAngle(i) = atan2d(tempTracking.Tailbase(2,i) - tempTracking.MidBack(2,i), tempTracking.Tailbase(1,i) - tempTracking.MidBack(1,i));
-            end
-            try
-                Metrics.degTailAngle(i) = atan2d(tempTracking.Tailbase(2,i) - tempTracking.Tail(2,i), tempTracking.Tailbase(1,i) - tempTracking.Tail(1,i));
-            end
+            Metrics.degFullBodyAngle(i) = atan2d(tempTracking.RearBack(2,i) - tempTracking.BetwEars(2,i), tempTracking.RearBack(1,i) - tempTracking.BetwEars(1,i));
+        end
+    end
+
+    if ~isempty(tempTracking.BetwEars) && ~isempty(tempTracking.MidBack)
+        Metrics.degFrontBodyAngle = zeros(1, numframes);
+        for i = 1:numframes
+            Metrics.degFrontBodyAngle(i) = atan2d(tempTracking.MidBack(2,i) - tempTracking.BetwEars(2,i), tempTracking.MidBack(1,i) - tempTracking.BetwEars(1,i));
+        end
+    end
+
+    if ~isempty(tempTracking.Tailbase) && ~isempty(tempTracking.MidBack)
+        Metrics.degRearBodyAngle = zeros(1, numframes);
+        for i = 1:numframes
+            Metrics.degRearBodyAngle(i) = atan2d(tempTracking.Tailbase(2,i) - tempTracking.MidBack(2,i), tempTracking.Tailbase(1,i) - tempTracking.MidBack(1,i));
+        end
+    end
+
+    if ~isempty(tempTracking.Tailbase) && ~isempty(tempTracking.Tail)
+        Metrics.degTailAngle = zeros(1, numframes);
+        for i = 1:numframes
+            Metrics.degTailAngle(i) = atan2d(tempTracking.Tailbase(2,i) - tempTracking.Tail(2,i), tempTracking.Tailbase(1,i) - tempTracking.Tail(1,i));
         end
     end
 
@@ -288,9 +317,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         
     %% Velocity Calculations
     for i_part = 1:length(fn)
-        for i = 1:numframes
-            Metrics.Velocity.(fn{i_part})(i) = sqrt(Metrics.Diff.(fn{i_part})(1,i)^2 + Metrics.Diff.(fn{i_part})(2,i)^2); % find hypotenuse
-        end
+        Metrics.Velocity.(fn{i_part}) = hypot(Metrics.Diff.(fn{i_part})(1,:), Metrics.Diff.(fn{i_part})(2,:));
     end
 
     %% Acceleration Calculations
@@ -306,7 +333,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     if isfield(tempTracking, 'MidBack')
         locat = tempTracking.MidBack;
     elseif isfield(tempTracking, 'BetwEars')
-        locat = tempTracking.RearBack;
+        locat = tempTracking.BetwEars;
     elseif isfield(tempTracking, 'BetwLegs')
         locat = tempTracking.BetwLegs;
     elseif isfield(tempTracking, 'Head')
@@ -326,7 +353,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     Metrics.Location = locat;
 
     diff_frame = diff(locat, 1, 2); % Calculate xy differentials (right angle side lengths btwn points)
-    dist_frame = sqrt(sum(diff_frame .* diff_frame, 1)); % Pythagorian theorem
+    dist_frame = hypot(diff_frame(1,:), diff_frame(2,:)); % Pythagorian theorem
     Metrics.Movement.Data = dist_frame * Params.Video.frameRate / Params.px2cm;  % frame by frame movement in cm per sec 
     Metrics.Movement.DataUnits = 'cm per sec';
     Metrics.Movement.DistanceTraveled = [0 cumsum(dist_frame)] / Params.px2cm;  % Cumulative distance traveled per frame
@@ -359,7 +386,7 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
         dist_to_pt = [locat(1,:) - this_pt(1); locat(2,:) - this_pt(2)];
         
         % Pythagorean theorem; save to Metrics.Dist
-        Metrics.Dist.(dist_pts{c})  = sqrt(dist_to_pt(1,:).^2 + dist_to_pt(2,:).^2);
+        Metrics.Dist.(dist_pts{c})  = hypot(dist_to_pt(1,:), dist_to_pt(2,:));
 
         clearvars dist_to_pt
     end
@@ -368,5 +395,12 @@ function [Metrics, Tracking, Params, P] = calculateMetrics(Tracking, Params, P)
     Tracking.Smooth = tempTracking;
     
     disp('Tracked point dynamics calculated.')
-    close;
+end
+
+function settingsFolder = localPartLookupFolder(P)
+if isfield(P, 'codePath') && ~isempty(P.codePath)
+    settingsFolder = P.codePath;
+else
+    settingsFolder = fileparts(fileparts(mfilename('fullpath')));
+end
 end

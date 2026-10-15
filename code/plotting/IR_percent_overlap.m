@@ -2,7 +2,6 @@
 
 function IR_percent_overlap(IR_Results, behavior, save_fig)
 
-    cd(IR_Results.working_directory)
     figure()
     heatmap(IR_Results.names, IR_Results.names, IR_Results.(behavior).percent_overlap)
     title('Percent Overlap Between Raters')
@@ -12,6 +11,6 @@ function IR_percent_overlap(IR_Results, behavior, save_fig)
     end
     
     if save_fig == 1
-        saveas(gcf, 'IR_PercentOverlap.png')
+        saveas(gcf, fullfile(IR_Results.working_directory, 'IR_PercentOverlap.png'))
     end
 end

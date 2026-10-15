@@ -29,7 +29,7 @@ save_model = 1;
 % Ask User which Mode to Use
 focused = 0;
 
-[choice_inds, ~] = listdlg('ListString',{'Focused', 'Broad'})
+[choice_inds, ~] = listdlg('ListString',{'Focused', 'Broad'});
 
 % Run focused mode, if selected
 if sum(choice_inds == 1) == 1

@@ -15,25 +15,25 @@
 % 4) countThreshold (arbitrary, empirically determined)
 % 5) minDuration (sec)
 
-function Freezing = calculateFreezing_velocity(Params, Tracking, Metrics)    
+function Freezing = calculateFreezing_velocity(Params, ~, Metrics)    
 
     velocityThreshold = Params.Freezing.velocityThreshold;
     angleThreshold = Params.Freezing.angleThreshold;
 
-    % Appy thresholds to velocity data
+    % Apply thresholds to velocity data
     try
         % Collect frames falling below forward & angular velocity thresholds
         try
             % First attempt: Average head and rear back velocities
-            withinFreezingThreshold = (nanmean([Metrics.Velocity.Head;Metrics.Velocity.RearBack]) < velocityThreshold)...
+            withinFreezingThreshold = (mean([Metrics.Velocity.Head;Metrics.Velocity.RearBack], 'omitnan') < velocityThreshold)...
                                     & (abs(Metrics.Velocity.HeadAngle) < angleThreshold);
         catch
             % Second attempt: Average head and tailbase velocities
-            withinFreezingThreshold = (nanmean([Metrics.Velocity.Head;Metrics.Velocity.Tailbase]) < velocityThreshold)...
+            withinFreezingThreshold = (mean([Metrics.Velocity.Head;Metrics.Velocity.Tailbase], 'omitnan') < velocityThreshold)...
                                     & (abs(Metrics.Velocity.HeadAngle) < angleThreshold);
         end
     catch
-        disp('Error with freezing classifer. Velocity classifier requires Head (i.e. Ears + Nose) and RearBack (or Tailbase) to be tracked');
+        error('Error with freezing classifer. Velocity classifier requires Head (i.e. Ears + Nose) and RearBack (or Tailbase) to be tracked');
     end
 
     % Apply convolution for smoothing

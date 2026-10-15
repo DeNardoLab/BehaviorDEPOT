@@ -29,15 +29,12 @@ function convertHumanAnnotations_BD()
     total_frames = input('Type total number of frames in video');
 
     % Load Params from MATLAB analysis script OR set total_frames to the total number of video frame
-    base_dir = pwd;
-    cd(data_path)
-    
     [~, name, type] = fileparts(data_filename);
     
     if strcmpi(type, '.mat')
-        human_labels = load([data_path, data_filename]);
+        human_labels = load(fullfile(data_path, data_filename));
     elseif strcmpi(type, '.csv')
-        T = readtable([data_path, data_filename]);
+        T = readtable(fullfile(data_path, data_filename));
         
         if size(T, 2) == 3
             human_labels.data = T;
@@ -67,16 +64,16 @@ function convertHumanAnnotations_BD()
         
     if ~exist('total_frames', 'var')
         % Grab information from video file
-        vid_dir = dir('*.avi');
+        vid_dir = dir(fullfile(data_path, '*.avi'));
     
         if size(vid_dir, 1) == 0
-            vid_dir = dir('*.mp4');
+            vid_dir = dir(fullfile(data_path, '*.mp4'));
         elseif size(vid_dir, 1) > 1
             vid_search = strcat(data_filename(1:6), '*.avi');
-            vid_dir = dir(vid_search);
+            vid_dir = dir(fullfile(data_path, vid_search));
         end
 
-        video_name = vid_dir.name;
+        video_name = fullfile(vid_dir.folder, vid_dir.name);
         vid = VideoReader(video_name);
         total_frames = vid.NumFrames;
         frame_rate = vid.FrameRate;
@@ -159,13 +156,12 @@ function convertHumanAnnotations_BD()
     % NOTE: custom naming has been removed from GUI-accessed function;
     % update later to allow custom naming via 'output_filename', if desired
     if exist('output_filename', 'var')
-        output_filename = strcat(output_filename, '.mat')
-        save(output_filename, 'hBehavior')
+        output_filename = strcat(output_filename, '.mat');
+        save(fullfile(data_path, output_filename), 'hBehavior')
     else
-        new_struct_name = strcat('hB_', name, '.mat')
-        save(new_struct_name, 'hBehavior')
+        new_struct_name = strcat('hB_', name, '.mat');
+        save(fullfile(data_path, new_struct_name), 'hBehavior')
     end
     
-    cd(base_dir)
-    clear all
+    clearvars
 end

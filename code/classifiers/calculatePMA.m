@@ -25,17 +25,10 @@ platform = Params.PMA.Platform.inROIvector;
 platform = convolveFrames(platform, Params.PMA.windowWidth, Params.PMA.countThreshold);
 
 % Find Tone file
-start_dir = pwd;
-cd(Params.basedir);
-cue_search = dir('*cue*.csv');
-cd(start_dir)
+cue_search = dir(fullfile(Params.basedir, '*cue*.csv'));
 
 if size(cue_search, 1) == 1
-    if ispc
-        cue_file = [cue_search.folder, '\', cue_search.name];
-    else
-        cue_file = [cue_search.folder, '/', cue_search.name];
-    end
+    cue_file = fullfile(cue_search.folder, cue_search.name);
 end
 
 % Set Tone Info

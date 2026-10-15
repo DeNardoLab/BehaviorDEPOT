@@ -17,7 +17,7 @@ function IR_percent_agreement(IR_Results, behavior, save_fig)
     end
     
     if save_fig == 1
-        saveas(gcf, 'IR_PercentAgreement.png')
+        saveas(gcf, fullfile(IR_Results.working_directory, 'IR_PercentAgreement.png'))
     end
     
 end

@@ -29,12 +29,10 @@ if ~ispc
 end
 input_filepath = uigetdir('','Select a BehDEPOT (_analyzed) or batch folder to use for optimization');
 
-cd(input_filepath)
-
 % Check if single or batch session
-D_a = dir('Behavior.mat');
-cd('..')
-D_hB = dir('*hB*.mat');
+D_a = dir(fullfile(input_filepath, 'Behavior.mat'));
+[input_parent, ~] = fileparts(input_filepath);
+D_hB = dir(fullfile(input_parent, '*hB*.mat'));
 
 if size(D_a, 1) + size(D_hB, 1) == 2
     single_sess = true;
@@ -66,15 +64,13 @@ class_path = [app_path, 'classifiers'];
 %% Main Script
 for f = 1:size(data_dirs,2)
 
-    cd(data_dirs{f})
-
     if single_sess
         if ~ispc
             menu('Select a hB file (output from convertHumanAnnotations.m)', 'OK')
         end
         [hB_file, hB_path] = uigetfile('','Select a hB file (output from convertHumanAnnotations.m)');
     else
-        hB_search = dir('*hB_*.mat');
+        hB_search = dir(fullfile(data_dirs{f}, '*hB_*.mat'));
         if size(hB_search, 1) == 1
             hB_file = hB_search.name;
             hB_path = hB_search.folder;
@@ -84,9 +80,9 @@ for f = 1:size(data_dirs,2)
             return
         end
 
-        analyzed_search = dir('*_analyzed');
+        analyzed_search = dir(fullfile(data_dirs{f}, '*_analyzed'));
         if size(analyzed_search, 1) == 1
-            BD_filepath = [analyzed_search.folder, addSlash(), analyzed_search.name];
+            BD_filepath = fullfile(analyzed_search.folder, analyzed_search.name);
         else
             disp(['Error finding BehaviorDEPOT "_analyzed" data in ' data_dirs{f}])
             disp('Cancelling analysis.')
@@ -95,15 +91,14 @@ for f = 1:size(data_dirs,2)
     end
 
     % Load data from hB file
-    full_hB_path = [hB_path, addSlash(), hB_file];
+    full_hB_path = fullfile(hB_path, hB_file);
     load(full_hB_path);
     
     % Load in data from analyzed filepath
-    cd(BD_filepath)
-    to_load = dir('*.mat');
+    to_load = dir(fullfile(BD_filepath, '*.mat'));
         
     for i = 1:length(to_load)
-        load(to_load(i).name)
+        load(fullfile(to_load(i).folder, to_load(i).name))
     end
     
     testParams = Params;
@@ -124,8 +119,7 @@ for f = 1:size(data_dirs,2)
         behavior_to_test = struct_fields{behav_ind};
         
         
-        cd(class_path)
-        class_search = dir;
+        class_search = dir(class_path);
         class_search(1:2) = [];
         classifier_names = {};
         c = 1;
@@ -144,9 +138,6 @@ for f = 1:size(data_dirs,2)
         classifier = classifier_names{class_ind};
         classifier_noext = extractBefore(classifier, ".");
         class_fn = str2func(classifier_noext);
-        
-        % Move back to data directory
-        cd(data_dirs{f})
         
         % Copy Params and change thresholds
         thresh_names = fieldnames(testParams.(behavior_to_test));
@@ -202,35 +193,19 @@ for f = 1:size(data_dirs,2)
             if size(cmp, 2) < size(cmp, 1)
                 cmp = cmp';
             end
-            error = ref - cmp;
-            tp = zeros(length(error),1);
-            tn = zeros(length(error),1);
-            for r = 1:length(error)
-                if error(r) == 0 && ref(r) == 1
-                    tp(r) = 1;
-                elseif error(r) == 0 && ref(r) == 0
-                    tn(r) = 1;
-                end
-            end
-            fp = (error == -1); 
-            fn = (error == 1);
+            [precision(p1, p2), recall(p1, p2), f1_score(p1, p2), ~, counts] = calculatePerformance(ref, cmp);
             
-            TP(p1, p2) = sum(tp);
-            TN(p1, p2) = sum(tn);
-            FP(p1, p2) = sum(fp);
-            FN(p1, p2) = sum(fn);
-            
-            % Calculate Precision, Recall, & F1 Score
-            precision(p1, p2) = TP(p1, p2) / (TP(p1, p2) + FP(p1, p2));
-            recall(p1, p2) = TP(p1, p2) / (TP(p1, p2) + FN(p1, p2));
-            f1_score(p1, p2) = (2*precision(p1, p2)*recall(p1, p2)) / (precision(p1, p2) + recall(p1, p2));
+            TP(p1, p2) = counts.TruePositives;
+            TN(p1, p2) = counts.TrueNegatives;
+            FP(p1, p2) = counts.FalsePositives;
+            FN(p1, p2) = counts.FalseNegatives;
             
         end
     end
     
     %% Prep Save Folder
-    mkdir('Optimization_Results')
-    cd('Optimization_Results')
+    results_folder = fullfile(data_dirs{f}, 'Optimization_Results');
+    mkdir(results_folder)
     
     %% FIGURES 1 & 2: Generate Heatmaps of F1 Scores versus parameter value
     f1 = figure(1);
@@ -245,8 +220,8 @@ for f = 1:size(data_dirs,2)
     ylabel(thresh1)
     title('Recall')
     f1.WindowState = 'maximized';
-    savefig(f1, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'Precision_Recall'])
-    saveas(f1, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'Precision_Recall.jpg'])
+    savefig(f1, fullfile(results_folder, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'Precision_Recall']))
+    saveas(f1, fullfile(results_folder, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'Precision_Recall.jpg']))
     close(f1)
     
     f2 = figure(2);
@@ -255,8 +230,8 @@ for f = 1:size(data_dirs,2)
     ylabel(thresh1)
     title('F1 Score')
     f2.WindowState = 'maximized';
-    savefig(f2, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'F1_Scores'])
-    saveas(f2, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'F1 Scores.jpg'])
+    savefig(f2, fullfile(results_folder, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'F1_Scores']))
+    saveas(f2, fullfile(results_folder, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, 'F1 Scores.jpg']))
     close(f2)
     
     %% Organize Data into oResults structure
@@ -273,7 +248,7 @@ for f = 1:size(data_dirs,2)
     oResults.f1_score = f1_score;
     
     %% Save oResults structure
-    save([behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, '_oResults.mat'], 'oResults')
+    save(fullfile(results_folder, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, '_oResults.mat']), 'oResults')
     
     %% Save data to group structure
     o_results.data_filepath{f} = BD_filepath;
@@ -292,8 +267,6 @@ if ~single_sess
     o_results.AvgRecall = mean(o_results.recall,3);
     o_results.AvgF1 = mean(o_results.f1_score,3);
 
-    cd(input_filepath)
-    
     %% GROUP FIGURES 1 & 2: Generate Heatmaps of Mean Precision/Recall & F1 Scores versus parameter values
     f1 = figure(1);
     subplot(2,1,1)
@@ -307,8 +280,8 @@ if ~single_sess
     ylabel(o_results.thresh1)
     title('Recall')
     f1.WindowState = 'maximized';
-    savefig(f1, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg Precision_Recall'])
-    saveas(f1, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg Precision_Recall.jpg'])
+    savefig(f1, fullfile(input_filepath, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg Precision_Recall']))
+    saveas(f1, fullfile(input_filepath, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg Precision_Recall.jpg']))
     close(f1)
     
     f2 = figure(2);
@@ -317,11 +290,11 @@ if ~single_sess
     ylabel(o_results.thresh1)
     title('F1 Score')
     f2.WindowState = 'maximized';
-    savefig(f2, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg F1_Scores'])
-    saveas(f2, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg F1_Scores.jpg'])
+    savefig(f2, fullfile(input_filepath, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg F1_Scores']))
+    saveas(f2, fullfile(input_filepath, [behavior_to_test, '_', thresh1{:}, '_', thresh2{:},  ' Avg F1_Scores.jpg']))
     close(f2)
     
     oResults = o_results;
-    save(['Group ', behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, ' _oResults.mat'], 'oResults')
+    save(fullfile(input_filepath, ['Group ', behavior_to_test, '_', thresh1{:}, '_', thresh2{:}, ' _oResults.mat']), 'oResults')
 end
 end

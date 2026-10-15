@@ -9,16 +9,18 @@ end
 
 all_metrics = struct();
 outer_metrics = fieldnames(Metrics);
+max_frames = 0;
 
 for i = 1:length(outer_metrics)
     this_metric = Metrics.(outer_metrics{i});
     if isa(this_metric, 'double')
         if size(this_metric, 1) == 1 %Copy metric
             all_metrics.(outer_metrics{i}) = this_metric;
-            max_frames = size(this_metric, 2);
+            max_frames = max(max_frames, size(this_metric, 2));
         elseif size(this_metric, 1) == 2 %Split into x/y
             all_metrics.([outer_metrics{i} '_X']) = this_metric(1, :);
             all_metrics.([outer_metrics{i} '_Y']) = this_metric(2, :);
+            max_frames = max(max_frames, size(this_metric, 2));
         end
         
     elseif isstruct(this_metric)
@@ -27,9 +29,11 @@ for i = 1:length(outer_metrics)
             this_inner_metric = this_metric.(inner_metrics{ii});
             if size(this_inner_metric, 1) == 1 %Copy metric
                 all_metrics.([outer_metrics{i}, '_', inner_metrics{ii}]) = this_inner_metric;
+                max_frames = max(max_frames, size(this_inner_metric, 2));
             elseif size(this_inner_metric, 1) == 2 %Split into x/y
                 all_metrics.([outer_metrics{i}, '_', inner_metrics{ii}, '_X']) = this_inner_metric(1, :);
                 all_metrics.([outer_metrics{i}, '_', inner_metrics{ii}, '_Y']) = this_inner_metric(2, :);
+                max_frames = max(max_frames, size(this_inner_metric, 2));
             end   
         end
     end
@@ -47,7 +51,7 @@ for i = 1:length(field_check)
     end   
 end
 
-try
+if isfield(all_metrics, 'DistanceTravelled_cm')
     all_metrics = rmfield(all_metrics, 'DistanceTravelled_cm');
 end
 

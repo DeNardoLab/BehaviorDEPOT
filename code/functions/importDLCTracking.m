@@ -6,13 +6,12 @@
 
 function [data, Params] = importDLCTracking(Params)
     data = [];
-    cd(Params.basedir);
     disp('Reading tracking file')
     % Check if CSV file
     if contains(Params.tracking_type, 'csv')
         % Check if tracking_file is known
         if ~isfield(Params,'tracking_file')
-            S = dir('*.csv');
+            S = dir(fullfile(Params.basedir, '*.csv'));
             if length(S) > 1  % differentiate cue and tracking csv files
                 [~,vid_name] = fileparts(Params.video_file);
                 for s = 1:length(S)
@@ -23,7 +22,7 @@ function [data, Params] = importDLCTracking(Params)
             else
                 trackfile = 1;
             end
-            Params.tracking_file = [S(trackfile).folder, addSlash(), S(trackfile).name];
+            Params.tracking_file = fullfile(S(trackfile).folder, S(trackfile).name);
         end
         
         % Import data from CSV file
@@ -36,7 +35,7 @@ function [data, Params] = importDLCTracking(Params)
     % Check if H5 file
     elseif contains(Params.tracking_type, 'h5')
         if ~isfield(Params,'tracking_file')
-            S = dir('*.h5');
+            S = dir(fullfile(Params.basedir, '*.h5'));
             if size(S, 1) == 1
                 trackfile = 1;
             elseif size(S, 1) > 1
@@ -47,7 +46,7 @@ function [data, Params] = importDLCTracking(Params)
                     end
                 end
             end
-            Params.tracking_file = [S(trackfile).folder, addSlash(), S(trackfile).name];
+            Params.tracking_file = fullfile(S(trackfile).folder, S(trackfile).name);
         end
         
         % Collect tracking xy data and likelihood and save to 'data'

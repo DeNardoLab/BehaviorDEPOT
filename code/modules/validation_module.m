@@ -18,13 +18,9 @@ disp('Select directory containing folders with paired hB files (output from conv
 data_directory = uigetdir('','Select directory containing data folders with hB and Behavior files');
 homedir = pwd;
 
-%% Check if single or batch mode based on dir contents
-
-cd(data_directory)
-
 % Search input directory
-BD_search = dir(['**/', analyzed_ID]);
-hB_search = dir(['**/', hB_ID]);
+BD_search = dir(fullfile(data_directory, '**', analyzed_ID));
+hB_search = dir(fullfile(data_directory, '**', hB_ID));
 
 BD_paths = {BD_search.folder};
 hB_paths = {hB_search.folder};
@@ -62,18 +58,14 @@ end
 
 %% Validation
 for file_num = 1:length(to_validate)
-    % cd into correct directory
     d_folder = to_validate(file_num).path{:};
-    cd(d_folder)
     
     ref_file = to_validate(file_num).hBfile;
-    load(ref_file);
+    load(fullfile(d_folder, ref_file));
 
     comp_dir = to_validate(file_num).BDfile;
 
-    cd(comp_dir)
-    load('Behavior.mat')
-    cd('../')
+    load(fullfile(d_folder, comp_dir, 'Behavior.mat'))
     
     VResults.ReferenceFiles(file_num, :) = string(ref_file);
     VResults.ComparisonFiles(file_num, :) = string(comp_dir);
@@ -111,36 +103,10 @@ for file_num = 1:length(to_validate)
     ref_data = hBehavior.(rf_name{1}).Vector;
     comp_data = Behavior.(cf_name{1}).Vector;
     
-    % Compare data by accessing behavior vectors
-    error_matrix = ref_data - comp_data;
-    total_frames = length(error_matrix);
+    [precision(file_num), recall(file_num), f1_score(file_num), specificity(file_num), counts] = calculatePerformance(ref_data, comp_data);
     
-    % Sort data into TP, TN, FP, FN   
-    TP = zeros(size(ref_data));
-    TN = zeros(size(ref_data));
-    
-    for ii = 1:total_frames
-        if (error_matrix(ii) == 0) && (ref_data(ii) == 1)
-            TP(ii) = 1;
-        elseif (error_matrix(ii) == 0) && (ref_data(ii) == 0)
-            TN(ii) = 1;
-        end
-    end
-    
-    FP = error_matrix == 1;
-    FN = error_matrix == -1;
-    
-    VResults.FalsePositives(file_num) = sum(FP);
-    VResults.FalseNegatives(file_num) = sum(FN);
-    
-    %% Calculate Precision & Recall
-    
-    precision(file_num) = sum(TP) / sum(FP + TP);
-    recall(file_num) = sum(TP) / sum(FN + TP);
-    specificity(file_num) = sum(TN) / sum(TN + FP);
-    f1_score(file_num) = 2*(precision(file_num) .* recall(file_num)) / (precision(file_num) + recall(file_num));
-    
-    cd('../')
+    VResults.FalsePositives(file_num) = counts.FalsePositives;
+    VResults.FalseNegatives(file_num) = counts.FalseNegatives;
     
     clearvars -except VResults behav_to_validate data_directory f1_score file_num hB_ID analyzed_ID precision recall specificity to_validate
 end
@@ -157,30 +123,28 @@ VResults.Avg_Specificity = nanmean(specificity);
 VResults.Avg_F1 = nanmean(f1_score);
 
 % Change to data directory and make VResults folder
-cd(data_directory)
 results_folder = 'ValidationResults';
-mkdir(results_folder)
-cd(results_folder)
+results_path = fullfile(data_directory, results_folder);
+mkdir(results_path)
 
 cur_time = datestr(now, 'mmm_dd_HHMM');
 
 % Plot and Save Figures
 if length(to_validate) > 1
     fig1 = plotValidationPerformance(VResults);
-    saveas(fig1, [behav_to_validate, '_PerformanceByVideo_', cur_time, '.jpg'])
+    saveas(fig1, fullfile(results_path, [behav_to_validate, '_PerformanceByVideo_', cur_time, '.jpg']))
     close(fig1)
     
     fig2 = plotValidationAvg(VResults);
-    saveas(fig2, [behav_to_validate, '_AvgPerformance_', cur_time, '.jpg'])
+    saveas(fig2, fullfile(results_path, [behav_to_validate, '_AvgPerformance_', cur_time, '.jpg']))
     close(fig2) 
 else
     fig1 = plotValidationSingle(VResults);
-    saveas(fig1, [behav_to_validate, '_Performance_', cur_time, '.jpg'])
+    saveas(fig1, fullfile(results_path, [behav_to_validate, '_Performance_', cur_time, '.jpg']))
     close(fig1)
 end
 
-save([behav_to_validate,'_Validation', '.mat'], 'VResults')
-cd(data_directory)
+save(fullfile(results_path, [behav_to_validate,'_Validation', '.mat']), 'VResults')
 clearvars -except VResults
 disp('Validation metrics calculated and saved in data directory');
 end

@@ -4,7 +4,6 @@
 function [data, Params] = importSLEAPTracking(Params)
 
 %% Load data from SLEAP h5
-cd(Params.basedir);
 disp('Reading tracking file')
 
 node_names = h5read(Params.tracking_file, '/node_names');

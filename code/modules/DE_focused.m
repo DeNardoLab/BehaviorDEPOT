@@ -4,11 +4,10 @@
 
 function DE_focused(analyzed_filepath, hB_path, hB_file)
 % Load in data from filepath
-cd(analyzed_filepath)
-to_load = dir('*.mat');
+to_load = dir(fullfile(analyzed_filepath, '*.mat'));
 
 for i = 1:length(to_load)
-    load(to_load(i).name)
+    load(fullfile(to_load(i).folder, to_load(i).name))
 end
 
 % Prompt user to choose Metrics
@@ -37,7 +36,7 @@ else
 end
 
 % Load human annotations
-load([hB_path, hB_file])
+load(fullfile(hB_path, hB_file))
 
 % Extract behaviors from hB struct
 hB_list = fieldnames(hBehavior);
@@ -66,33 +65,33 @@ m2_cmp = m2_data(cmp_vector);
 %% Output Calculations
 %% Calculate mean & SD for raw and Z-scored data sets
 
-m1_mean = nanmean(m1_data);
-m1_SD = nanstd(m1_data);
-m1_behav_mean = nanmean(m1_behav);
-m1_cmp_mean = nanmean(m1_cmp);
-m1_behav_SD = nanstd(m1_behav);
-m1_cmp_SD = nanstd(m1_cmp);
+m1_mean = mean(m1_data, 'omitnan');
+m1_SD = std(m1_data, 'omitnan');
+m1_behav_mean = mean(m1_behav, 'omitnan');
+m1_cmp_mean = mean(m1_cmp, 'omitnan');
+m1_behav_SD = std(m1_behav, 'omitnan');
+m1_cmp_SD = std(m1_cmp, 'omitnan');
 m1_Z = zscore(m1_data);
 m1_behav_Z = m1_Z(behav_vector);
 m1_cmp_Z = m1_Z(cmp_vector);
-m1_behav_Z_mean = nanmean(m1_behav_Z);
-m1_cmp_Z_mean = nanmean(m1_cmp_Z);
-m1_behav_Z_SD = nanstd(m1_behav_Z);
-m1_cmp_Z_SD = nanstd(m1_cmp_Z);
+m1_behav_Z_mean = mean(m1_behav_Z, 'omitnan');
+m1_cmp_Z_mean = mean(m1_cmp_Z, 'omitnan');
+m1_behav_Z_SD = std(m1_behav_Z, 'omitnan');
+m1_cmp_Z_SD = std(m1_cmp_Z, 'omitnan');
 
-m2_mean = nanmean(m2_data);
-m2_SD = nanstd(m2_data);
-m2_behav_mean = nanmean(m2_behav);
-m2_cmp_mean = nanmean(m2_cmp);
-m2_behav_SD = nanstd(m2_behav);
-m2_cmp_SD = nanstd(m2_cmp);
+m2_mean = mean(m2_data, 'omitnan');
+m2_SD = std(m2_data, 'omitnan');
+m2_behav_mean = mean(m2_behav, 'omitnan');
+m2_cmp_mean = mean(m2_cmp, 'omitnan');
+m2_behav_SD = std(m2_behav, 'omitnan');
+m2_cmp_SD = std(m2_cmp, 'omitnan');
 m2_Z = zscore(m2_data);
 m2_behav_Z = m2_Z(behav_vector);
 m2_cmp_Z = m2_Z(cmp_vector);
-m2_behav_Z_mean = nanmean(m2_behav_Z);
-m2_cmp_Z_mean = nanmean(m2_cmp_Z);
-m2_behav_Z_SD = nanstd(m2_behav_Z);
-m2_cmp_Z_SD = nanstd(m2_cmp_Z);
+m2_behav_Z_mean = mean(m2_behav_Z, 'omitnan');
+m2_cmp_Z_mean = mean(m2_cmp_Z, 'omitnan');
+m2_behav_Z_SD = std(m2_behav_Z, 'omitnan');
+m2_cmp_Z_SD = std(m2_cmp_Z, 'omitnan');
 
 %% Randomly Subset Data from Larger Distribution to Match Smaller Distribution
 
@@ -209,7 +208,7 @@ m2_cmp_mahal_mean = mean(m2_cmp_mahal);
 % Generate generalized linear model using selected metrics
 tbl = table(m1_data', m2_data', behav_vector');
 mdl_spec = 'Var3 ~ Var1*Var2 - Var1:Var2';
-mdl = fitglm(tbl, mdl_spec, 'Distribution', 'binomial')
+mdl = fitglm(tbl, mdl_spec, 'Distribution', 'binomial');
 
 m1_vals_to_test = [m1_mean-2*m1_SD, m1_mean-m1_SD, m1_mean, m1_mean+m1_SD, m1_mean+2*m1_SD];
 m2_vals_to_test = [m2_mean-2*m2_SD, m2_mean-m2_SD, m2_mean, m2_mean+m2_SD, m2_mean+2*m2_SD];
@@ -244,14 +243,14 @@ Mahalanobis = [m1_behav_mahal_mean, m1_cmp_mahal_mean, m2_behav_mahal_mean, m2_c
 results_table = table(Name, Mean, SD, Z_Mean, Z_SD, Mahalanobis);
 
 %% Save Figures and Table
-cd ..
-mkdir('DE_Results')
-cd('DE_Results')
+[data_folder, ~] = fileparts(analyzed_filepath);
+results_folder = fullfile(data_folder, 'DE_Results');
+mkdir(results_folder)
 
-save('GLM Model', 'mdl')
-savefig(f1, 'Behavior_Histograms')
-savefig(f2, 'Z-Score_Boxplots')
-savefig(f3, 'GLM_Probability_Estimates')
-writetable(results_table, 'Results')
+save(fullfile(results_folder, 'GLM Model'), 'mdl')
+savefig(f1, fullfile(results_folder, 'Behavior_Histograms'))
+savefig(f2, fullfile(results_folder, 'Z-Score_Boxplots'))
+savefig(f3, fullfile(results_folder, 'GLM_Probability_Estimates'))
+writetable(results_table, fullfile(results_folder, 'Results'))
 
 end

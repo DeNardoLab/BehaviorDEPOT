@@ -17,7 +17,7 @@
     % b) Chamber2
     % c) Chamber3
 
-function ThreeChamber = calculateThreeChamber(Params, ~, Metrics)
+function ThreeChamber = calculate3Chamber(Params, ~, Metrics)
 
 % Set total frames
 numFrames = Params.numFrames;
@@ -43,19 +43,25 @@ dist_traveled_frame = Metrics.Movement.DistanceTraveled;
 
 for i = 1:length(all_ROIs)
     % Calculate percent time in each chamber
-    ThreeChamber.(roi_names{i}).Bouts = findStartStop(all_ROIs{i});
+    roi_bouts = findStartStop(all_ROIs{i});
+    ThreeChamber.(roi_names{i}).Bouts = roi_bouts;
+    ThreeChamber.(roi_names{i}).Count = size(roi_bouts, 1);
+    if isempty(roi_bouts)
+        ThreeChamber.(roi_names{i}).Length = [];
+    else
+        ThreeChamber.(roi_names{i}).Length = roi_bouts(:,2) - roi_bouts(:,1);
+    end
     ThreeChamber.(roi_names{i}).Vector = all_ROIs{i};
     ThreeChamber.(roi_names{i}).TotalTime = sum(all_ROIs{i}) / fps;
     ThreeChamber.(roi_names{i}).PercentTime = sum(all_ROIs{i}) / numFrames;
     
-    % Collect start/stop inds for each roi
-    roi_bouts = findStartStop(all_ROIs{i});
-    
     % Calculate # of Entries into each ROI
-    ThreeChamber.(roi_names{i}).Entries = size(roi_bouts, 1);
+    ThreeChamber.(roi_names{i}).Entries = ThreeChamber.(roi_names{i}).Count;
+    ThreeChamber.(roi_names{i}).BoutDist = [];
+    ThreeChamber.(roi_names{i}).DistTraveled = 0;
     
     % Calculate distance traveled in each ROI
-    for ii = 1:size(roi_bouts, 1)
+    if ~isempty(roi_bouts)
         dist_count = zeros(size(roi_bouts));
         dist_count(:,1) = dist_traveled_frame(roi_bouts(:,1));
         dist_count(:,2) = dist_traveled_frame(roi_bouts(:,2));

@@ -6,14 +6,12 @@
 %FUNCTION: save structures as MATLAB files
 
 function saveBehAnalysis(analyzed_folder_name, Params, Behavior)
-    mkdir(analyzed_folder_name);
-    cd(analyzed_folder_name)
-    save('Params.mat', 'Params');
+    if ~isfolder(analyzed_folder_name)
+        mkdir(analyzed_folder_name);
+    end
+    save(fullfile(analyzed_folder_name, 'Params.mat'), 'Params');
     
     if size(fieldnames(Behavior), 1) > 0
-        save('Behavior.mat', 'Behavior');
+        save(fullfile(analyzed_folder_name, 'Behavior.mat'), 'Behavior');
     end
-
-    close all
-    cd('..')
 end

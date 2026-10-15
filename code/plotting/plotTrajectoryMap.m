@@ -63,10 +63,9 @@ if (Params.plotBeh) && (sum(beh_check)>0)
     
         legend(lgnd);
         beh_plot = gcf;   
-        cd(analyzed_folder_name)
         savename = strcat(i_beh_name, ' Map');
-        saveas(beh_plot, (savename), 'jpeg');
-        savefig(beh_plot, (savename));
+        saveas(beh_plot, fullfile(analyzed_folder_name, savename), 'jpeg');
+        savefig(beh_plot, fullfile(analyzed_folder_name, savename));
         close;
     end
 else
@@ -101,10 +100,9 @@ else
 
     legend(lgnd);
     sptm_plot = gcf;
-    cd(analyzed_folder_name)
     
-    saveas(sptm_plot, (savename), 'jpeg');
-    savefig(sptm_plot, (savename));
+    saveas(sptm_plot, fullfile(analyzed_folder_name, savename), 'jpeg');
+    savefig(sptm_plot, fullfile(analyzed_folder_name, savename));
     close;
 end
 end

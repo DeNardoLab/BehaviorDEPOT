@@ -1,102 +1,72 @@
 function P = drawROIs(Frame, P)
+%drawROIs Draw and name user-defined ROIs on a full-frame ROI panel.
 
-% Collect video frame to display
-frame_ids = fieldnames(Frame);
-frame = Frame.(frame_ids{randi(5,1)});
-
-% Draw ROI
-roi_limits = [];
-roi_name = [];
-
-if P.do_ROI
-    if ~isfield(P, 'reuse_roi_limits')
-        for r = 1:P.number_ROIs
-            repeat = true;
-            while repeat
-                disp(['Select ROI # ' num2str(r)]);
-                imshow(frame)
-                
-                % Plot previously drawn ROIs
-                if r > 1
-                   hold on;
-                   for nroi = 1:(r-1)
-                       plot(polyshape(roi_limits{nroi}), 'FaceAlpha', 0.25)
-                   end
-                end
-                
-                title(['Select ROI # ' num2str(r)]);
-
-                % Draw roi limits
-                roi = drawpolygon;
-                roi_limits{r} = roi.Position;
-                close;
-
-                prompt = {'Assign name to ROI (or press cancel to redraw ROI)'};  % give name to ROI
-                dlgtitle = 'Input';
-                dims = [1 60];
-                name = inputdlg(prompt,dlgtitle,dims);
-                if isempty(name)
-                    repeat = true;
-                else
-                    repeat = false;
-                end
-            end
-
-            name = cleanText(name);  % removes non alphanumeric chars
-            roi_name{r} = char(name);
-        end
-        
-        P.roi_names = roi_name;
-        P.roi_limits = roi_limits;
-
-        if P.batchSession
-            resp = questdlg('Re-use ROI limits(s) for other batched process files?', '', 'Yes', 'No', 'Yes');
-            if isequal(resp,'Yes')
-                P.reuse_roi_limits = 1;
-                P.reuse_roi_names = 1;
-            elseif isequal(resp,'No')
-                P.reuse_roi_limits = 0;
-                resp = questdlg('Re-use ROI name(s) for other batched process files?', '', 'Yes', 'No', 'Yes');
-                if isequal(resp,'Yes')
-                    P.reuse_roi_names = 1;
-                elseif isequal(resp,'No')
-                    P.reuse_roi_names = 0;
-                end
-            end
-        end
-
-    elseif P.reuse_roi_names && ~P.reuse_roi_limits
-        for r = 1:length(P.roi_names)
-            repeat = false;
-            while ~repeat
-                disp(['Select ROI # ' num2str(r), ': ' P.roi_names]);
-                imshow(frame)
-                
-                if r > 1
-                   hold on;
-                   for nroi = 1:(r-1)
-                       plot(polyshape(P.roi_limits{nroi}), 'FaceAlpha', 0.25)
-                   end
-                end
-                
-                title(['Select ROI # ' num2str(r)]);
-                roi = drawpolygon;
-                roi_limits{r} = roi.Position;
-                close;
-                
-                rsp = questdlg('Re-draw the ROI limits?', 'Confirm ROI Limits', 'Yes', 'No', 'No');
-                if strcmp(rsp, 'Yes')
-                    repeat = true;
-                else
-                    repeat = false;
-                end
-            end
-        end
-        P.roi_limits = roi_limits;
-    end
-else
-    P.reuse_roi_names = [];
-    P.reuse_roi_limits = [];
+if ~isfield(P, 'noninteractive')
+    P.noninteractive = false;
 end
 
+frameIds = fieldnames(Frame);
+frame = Frame.(frameIds{randi(numel(frameIds))});
+
+if ~P.do_ROI
+    return
+end
+
+hasSavedROIs = isfield(P, 'roi_limits') && ~isempty(P.roi_limits) && ...
+    isfield(P, 'roi_names') && ~isempty(P.roi_names);
+
+% If there are already saved ROIs, then turn on reuse and return
+if hasSavedROIs   
+    if P.batchSession && P.reuse_roi_limits
+        P.reuse_roi_limits = true;
+        P.reuse_roi_names = true;
+        return
+    end
+    
+elseif P.noninteractive
+    error('BehaviorDEPOT:drawROIs:MissingROIConfig', ...
+        'Noninteractive runs with P.do_ROI require P.roi_limits and P.roi_names.');
+end
+
+% Default start if there are no saved ROIs
+if ~P.reuse_roi_limits
+    roiLimits = cell(1, P.number_ROIs);
+    roiNames = cell(1, P.number_ROIs);
+
+    if P.reuse_roi_names
+        roiNames = P.roi_names;
+    end
+
+    for roiIndex = 1:P.number_ROIs
+        confirmed = false;
+        while ~confirmed
+            [roiLimits{roiIndex}, roiNames{roiIndex}, confirmed] = drawROIWithName( ...
+                frame, sprintf('Draw User ROI %d of %d', roiIndex, P.number_ROIs), ...
+                roiLimits(1:roiIndex - 1), roiNames{roiIndex}, true);
+        end
+    end
+
+    % Save drawn ROIs to P structure
+    if ~P.reuse_roi_names
+        P.roi_names = roiNames;
+    end
+    P.roi_limits = roiLimits;
+
+    % Prompt user for reuse preferences
+    if P.batchSession && ~hasSavedROIs
+        reuseROI = questdlg( ...
+            'Re-use ROIs for other batched process files?', 'ROI Options', ...
+            'Names & Limits', 'Names Only', 'No', 'No');
+        if isequal(reuseROI, 'No')
+            P.reuse_roi_limits = false;
+            P.reuse_roi_names = false;
+        elseif isequal(reuseROI, 'Names & Limits')
+            P.reuse_roi_limits = true;
+            P.reuse_roi_names = true;
+        elseif isequal(reuseROI, 'Names Only')
+            P.reuse_roi_limits = false;
+            P.reuse_roi_names = true;
+        end
+    end
+end
 end

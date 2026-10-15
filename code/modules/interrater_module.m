@@ -17,17 +17,12 @@ msgbox('Select directory containing rater files')
 pause(2);
 working_directory = uigetdir('','Select directory containing rater files');
 
-cd(working_directory)
-analyzed_search = dir(analyzed_ID);
-hB_search = dir(hB_ID);
+analyzed_search = dir(fullfile(working_directory, analyzed_ID));
+hB_search = dir(fullfile(working_directory, hB_ID));
 hB_names = {};
 
 for i = 1:size(hB_search,1)
-    if ~ispc
-        hB_files{i} = [hB_search(i).folder '/' hB_search(i).name];
-    else
-        hB_files{i} = [hB_search(i).folder '\' hB_search(i).name];
-    end
+    hB_files{i} = fullfile(hB_search(i).folder, hB_search(i).name);
     prompt = {['Assign name to rater file: ' hB_search(i).name]};  
     dlgtitle = 'Input';
     dims = [1 40];
@@ -38,11 +33,7 @@ end
 
 if size(analyzed_search, 1) >= 1
     for i = 1:size(analyzed_search, 1)
-        if ~ispc
-            analyzed_files{i} = [analyzed_search(i).folder '/' analyzed_search(i).name '/Behavior.mat'];
-        else
-            analyzed_files{i} = [analyzed_search(i).folder '\' analyzed_search(i).name '\Behavior.mat'];
-        end
+        analyzed_files{i} = fullfile(analyzed_search(i).folder, analyzed_search(i).name, 'Behavior.mat');
         prompt = {['Assign name to rater file: ' analyzed_search(i).name]};
         dlgtitle = 'Input';
         dims = [1 40];
@@ -97,8 +88,6 @@ if reference_number == avg_key
 else
     IR_Results.reference_name = names{reference_number};
 end
-
-cd(working_directory)
 
 rater_data(1).Behavior = [];
 
@@ -365,15 +354,14 @@ for b = 1:length(behav_selected)
             error_table = error_table(sort_order,:);
 
             %Save table within loop  
-            mkdir('Error tables')
-            cd('Error tables')
+            error_table_folder = fullfile(working_directory, 'Error tables');
+            mkdir(error_table_folder)
             if ~isequal(reference_number, avg_key)
                 filename = behav_selected{b} + "_Ref_" + names{reference_number} + "_Comp_" + names{j};
             else
                 filename = behav_selected{b} + "_Ref_Average" + "_Comp_" + names{j};
             end
-            writetable(error_table, filename)
-            cd(working_directory)
+            writetable(error_table, fullfile(error_table_folder, filename))
             end
             clearvars Start Stop Length Type type_fn type_fp sort_order error_table filename skip
         end
@@ -382,7 +370,7 @@ end
 
 %% save results
 results_filename_ext = strcat(results_filename, '.mat');
-save(results_filename_ext, 'IR_Results')
+save(fullfile(working_directory, results_filename_ext), 'IR_Results')
 msgbox('Interrater comparison complete; results saved in data directory')
 
 %% do plots

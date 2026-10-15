@@ -119,12 +119,12 @@ function convertHumanAnnotations(table_filename, total_frames, output_filename)
     %% Save Results
     
     if exist('output_filename')
-        output_filename = strcat(output_filename, '.mat')
+        output_filename = strcat(output_filename, '.mat');
         save(output_filename, 'hBehavior')
     else
         new_struct_name = strcat('hB_', struct_name);
-        new_struct_name = strcat(new_struct_name, '.mat')
+        new_struct_name = strcat(new_struct_name, '.mat');
         save(new_struct_name, 'hBehavior')
     end
-    clear all
+    clearvars
 end
